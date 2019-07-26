@@ -1,0 +1,17 @@
+<div class="layer" style="width:600px;">
+	<form name="FormPost" id="addHost-save" class="FormGrid"  method="post"
+		action="${ctxPath}/whiteList/addHost">
+		<table class="EditTable" width="100%">
+			<tbody>
+				<tr class="FormData">
+					<td class="CaptionTD">域名:</td>
+					<td class="DataTD">
+					<input type="text" name="finalHost" datatype="url" 
+						 nullmsg="域名不能为空" errormsg="请输入正确的域名！"/>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
+<#save formId="addHost-save" reloadUrl="true" okText="添加"/>

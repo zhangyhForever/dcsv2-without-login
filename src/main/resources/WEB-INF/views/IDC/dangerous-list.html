@@ -1,0 +1,140 @@
+<table class="table table-striped table-bordered table-hover nomargin-bottom" id="table">
+	<thead>
+		<tr>
+			<th class="center">原始域名</th>
+			<th class="center">跳转域名</th>
+			<th class="center" colspan="4">审核结果</th>
+		</tr>
+	</thead>
+
+	<tbody class="tbod">
+		@for(item in audits){
+		<tr>
+			<td class="center"><a class="green"
+				href="javascript:void(0)" onclick="ope(this,'${item.oriHost}')">${item.oriHost}
+				<input type="hidden" value="${item.oriHost}"/></a>
+			</td>
+			<td class="center">${item.finalHost}</td>
+			<td class="center">
+				<a class="green" href="javascript:void(0)" onclick="bad(this,'${item.auditId}','${item.submitTime}','${item.taskId}')">
+				<i class="ace-icon fa fa-pencil bigger-130">违规</i>
+				</a>
+			</td>
+			<td class="center">
+				<a class="green"  href="javascript:void(0)" onclick="good(this,'${item.auditId}','${item.submitTime}','${item.taskId}')">
+				 <i class="ace-icon fa fa-pencil bigger-130">正常</i>
+				 </a>
+			</td>
+			<td class="center">
+				<a class="green"  href="javascript:void(0)" onclick="unconfirm(this,'${item.auditId}','${item.submitTime}','${item.taskId}')">
+				 <i class="ace-icon fa fa-pencil bigger-130">不确定</i>
+				 </a>
+			</td>
+			<td class="center">
+				<a class="green"  href="javascript:void(0)" onclick="disable(this,'${item.auditId}','${item.submitTime}','${item.taskId}')">
+				 <i class="ace-icon fa fa-pencil bigger-130">页面失效</i>
+				 </a>
+			</td>
+		</tr>
+		@}
+	</tbody>
+</table>
+<script>
+	function ope(thiz,ur) {
+		$(".tbod").children("tr").each(function(){
+			$(this).css("background-color","#00132b")
+		})
+		$(thiz).parent().parent().css("background-color","rgba(255, 255, 255, 0.2)");
+		window.open(ur);
+	}
+	
+	function bad(thiz, auditId, submitTime, taskId) {
+		$.ajax({
+			url : "${ctxPath}/audit/dangerous/updateToBad",
+			type : 'post',
+			data : {
+				'auditId' : auditId,
+				'taskId' : taskId,
+				'submitTime' : submitTime
+			},
+			dataType : 'json',
+			success: function(data){
+				changeColor(thiz);
+			},
+			error: function(){
+				alert("操作失败！");
+			}
+		});
+	}
+	
+	function good(thiz, auditId, submitTime, taskId) {
+		$.ajax({
+			url : "${ctxPath}/audit/dangerous/updateToNormal",
+			type : 'post',
+			data : {
+				'auditId' : auditId,
+				'taskId' : taskId,
+				'submitTime' : submitTime
+			},
+			dataType : 'json',
+			success: function(data) {
+				changeColor(thiz);
+			},
+			error: function() {
+				alert("操作失败！");
+			}
+		});
+	}
+	
+	function unconfirm(thiz, auditId, submitTime, taskId){
+		$.ajax({
+			url: '${ctxPath}/audit/dangerous/unconfirm' ,
+			type: 'post',
+			data: {
+				'auditId': auditId,
+				'taskId' : taskId,
+				'submitTime' : submitTime
+			},
+			dateType: 'json',
+			success: function(data){
+				changeColor(thiz);
+			},
+			error: function() {
+				alert("操作失败!");
+			}
+		})
+	}
+
+	function disable(thiz, auditId, submitTime, taskId){
+		$.ajax({
+			url: '${ctxPath}/audit/dangerous/disable' ,
+			type: 'post',
+			data: {
+				'auditId': auditId,
+				'taskId' : taskId,
+				'submitTime' : submitTime
+			},
+			dateType: 'json',
+			success: function(data){
+				changeColor(thiz);
+			},
+			error: function() {
+				alert("操作失败!");
+			}
+		})
+	}
+	
+	//点击后改变字体颜色
+	function changeColor(thiz){
+		$(thiz).parent().parent().children("td").each(function(){
+			$(this).children("a").attr("class", "green");
+		})
+		$(thiz).attr("class", "red");
+	}
+	
+	$(function() {
+		$("#sx").show();
+		$("#tj").hide();
+		$("#fh").hide();
+	})
+</script>

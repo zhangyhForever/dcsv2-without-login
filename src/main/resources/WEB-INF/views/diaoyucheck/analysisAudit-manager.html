@@ -1,0 +1,177 @@
+<!--<<div style="overflow-x:scroll;">-->
+<div class="tabbable">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a data-toggle="tab" href="#home"> <i
+                class="green ace-icon fa fa-users bigger-120"></i> 统计审核
+        </a></li>
+        <li style="float: right"><input style="font-size:20px;text-align: center; color: #fff; background-color: #f8ac59;" value="" id="totalid" readonly></li>
+    </ul>
+
+    <div class="tab-content" style="width:100%; height: 290%">
+        <div style="float: left">
+            <input id="numid" style="margin-bottom:5px;  font-size:20px;text-align: center; color: #fff; background-color: #f8ac59;" value="" readonly>
+        </div>
+        <div style="float: right; width: 30%;margin-right: -15%">
+            <!--<span class="btn btn-grey btn-sm col-sm-5" id="stop">结束审核</span>-->
+            <span class="btn btn-primary btn-sm col-sm-5" id="next">下一篇</span>
+        </div>
+
+        <table id="tableid" class="table table-striped table-bordered table-hover nomargin-bottom" style="width:100%; table-layout: fixed">
+            <!--  <thead>-->
+            @for(item in list){
+            <tr>
+                <th rowspan="9" style="width: 50%">
+                    <iframe style="width: 100%; height: 68vh" frameBorder=0 src="${item.fileinfo}"></iframe>
+                </th>
+                <th class="center" style="height: 10%;vertical-align:middle;width: 10%">采集来源</th>
+                <td class="center" style="vertical-align:middle;">${item.sources}</td>
+            </tr>
+            <tr><th class="center" style="height: 10%;vertical-align:middle;width: 10%">采集URL</th>
+                <td class="center" style="vertical-align:middle;" title="${string.formatSubUrl(item.url)}">
+                    @if(item.url == ""){
+
+                    @}else {
+                        <a href="${string.formatSubUrl(item.url)}" target="_blank">${string.formatSubUrl(item.url)}</a>
+                    @}
+                </td>
+            </tr>
+            <tr><th class="center" style="height: 10%;vertical-align:middle;width: 10%">跳转URL</th>
+                <td class="center" style="vertical-align:middle;" title="${string.formatSubUrl(item.curUrl)}">
+                    @if(item.curUrl == ""){
+
+                    @}else {
+                        <a href="${string.formatSubUrl(item.curUrl)}" target="_blank">${string.formatSubUrl(item.curUrl)}</a>
+                    @}
+                </td>
+            </tr>
+            <tr><th class="center" style="height: 10%;vertical-align:middle;width: 10%">类型(大类)</th>
+                <td class="center" style="vertical-align:middle;">${item.categories}</td>
+            </tr>
+            <tr><th class="center" style="height: 10%;vertical-align:middle;width: 10%">类型(小类)</th>
+                <td class="center" style="vertical-align:middle;">${item.types}</td>
+            </tr>
+            <tr><th class="center" style="height: 10%;vertical-align:middle;width: 10%">页面标题</th>
+                <td class="center" style="vertical-align:middle;" title="${item.title}">${item.title}</td>
+            </tr>
+            <tr><th class="center" style="height: 10%;vertical-align:middle;width: 10%">文章正文</th>
+                <td class="center" style="vertical-align:middle;" title="${item.content}">${item.content}</td></tr>
+            </tr>
+            <tr><th class="center" style="height: 25%;vertical-align:middle;">操作</th>
+                <td class="center" style="vertical-align:middle;">
+                    <div style="width: 75%;margin-left: 12%">
+                        <span class="btn center btn-g btn-sm col-sm-5" onclick="normal(${item.id})" id="normal">有 效</span>
+                        <span class="btn center btn-yellow btn-sm col-sm-5" onclick="not(${item.id})" id="not">无 效</span>
+                    </div>
+                </td></tr>
+            </tr>
+            @}
+        </table>
+    </div>
+</div>
+
+<style>
+        table td{
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+</style>
+
+
+
+<script>
+
+     //刷新
+     $("#next").click(function(){
+         location.reload();
+     })
+
+     //当前剩余数量
+     function getTotal(){
+         $.ajax({
+             url:"${ctxPath}/analysisAudit/getTotal",
+             data:"",
+             dataType:"json",
+             type :"post",
+             async : false,
+             success:function (data) {
+                 $("#totalid").val("当前剩余条数"+data);
+             },
+             error : function (){
+                 alert("数据异常，请联系管理员！");
+             }
+         })
+     }
+
+     //今日审核数量
+     function getCount(){
+         $.ajax({
+             url:"${ctxPath}/analysisAudit/getCount",
+             data:"",
+             dataType:"json",
+             type :"post",
+             async : false,
+             success:function (data) {
+                 $("#numid").val("今日已审核数量："+data);
+             },
+             error : function (){
+                 alert("数据异常，请联系管理员！");
+             }
+         })
+     }
+
+
+     $(function(){
+         getTotal();
+         getCount();
+     })
+
+     //审核为有效的
+    function normal(id) {
+        $.ajax({
+            url:"${ctxPath}/analysisAudit/updateNormal",
+            data:{"id":id},
+            dataType:"text",
+            type :"post",
+            async : false,
+            success:function (data) {
+                    if(data=="success"){
+                        removeTR();
+                        getTotal();
+                        getCount();
+                    }
+            },
+            error : function (){
+                alert("数据异常，请联系管理员！");
+            }
+        })
+    }
+
+    //审核为无效的
+    function not(id){
+        $.ajax({
+            url:"${ctxPath}/analysisAudit/updateNot",
+            data:{"id":id},
+            dataType:"text",
+            type :"post",
+            async : false,
+            success:function (data) {
+                if(data=="success"){
+                    removeTR();
+                    getTotal();
+                    getCount();
+                }
+            },
+            error : function (){
+                alert("数据异常，请联系管理员！");
+            }
+        })
+    }
+
+    function removeTR(){
+        $("#tableid").html("");
+    }
+
+
+
+</script>

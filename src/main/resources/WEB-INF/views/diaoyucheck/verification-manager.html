@@ -1,0 +1,52 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#evidence"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 验证上报
+		</a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div id="evidence" class="tab-pane active clearfix">
+			<#search>
+				<form action="verificationReport/verify" method="post" id="verification-search-form"
+					target="verification-list-page" class="center clearfix">
+					<div class="row padding-tb-10">
+						<div class="col-sm-4">
+							<label class="inline">URL：</label> <input type="text"
+								class="width-85" name="url" id="url" />
+						</div>
+						<div class="col-sm-2">
+							<a href="javascript:void(0)" onclick="con()">
+							<input type="text" class="width-10" id="verification-search-btn" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;" value="验证" readonly/></a>
+						</div>
+						<span style="color: yellow;">URL含请求协议(如http://或https://)</span>
+					</div>
+				</form>
+			</#search>
+			<div class="space-8"></div>
+			<div class="list" id="verification-list-page"></div>
+		</div>
+	</div>
+</div>
+<style>
+#home input{background:#18202d;color:#fff;}
+#home select{background:#18202d;color:#fff;}
+</style>
+<script>
+	$(function(){
+		$("#sx").hide();
+		$("#tj").hide();
+	})
+	
+	function con(){
+		var url = $("#url").val();
+		if(url === ""){
+			alert("URL不能为空!");
+			return;
+		}
+		$("#verification-search-form").getPageList({
+			'submitBtnId' : 'verification-search-btn'
+		});
+	}
+
+</script>

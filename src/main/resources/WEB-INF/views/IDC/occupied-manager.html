@@ -1,0 +1,59 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#home"> <i
+				class="green ace-icon fa fa-users bigger-120"></i>初始化数据
+		</a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div id="home" class="tab-pane active clearfix">
+			<#search>
+			<form action="${ctxPath}/dialTest/occupiedDataList" method="post" id="search-form"
+				target="list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="search-btn" style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;" value="条件查询" hidden/> 
+						<a href="javascript:init();" class="width-45" >
+							<input type="text" value="初始化" class="width-45" style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;" readonly/>
+						</a>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="space-8"></div>
+			<div id="list-page"></div>
+		</div>
+	</div>
+</div>
+<style>
+#profile .center>label {
+	width: 100px;
+	text-align: right;
+}
+</style>
+<script>
+	$("#search-form").getPageList({
+		'submitBtnId' : 'search-btn'
+	});
+ 	//数据导出
+ 	function init() {
+		$.ajax({                      
+			url: "${ctxPath}/dialTest/initOccupiedData",
+			type: "post",
+			success: function(result){
+				if(result>0){
+					alert("初始化完成！");
+					location.reload();
+				}else{
+					alert("初始化失败！");
+				}
+			}
+		})
+ 	}
+	
+	$(function() {
+		$("#sx").hide();
+		$("#tj").hide();
+	});
+</script>
+

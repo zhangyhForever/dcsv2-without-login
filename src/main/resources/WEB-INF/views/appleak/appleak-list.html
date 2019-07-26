@@ -1,0 +1,46 @@
+<div  style="overflow-x:scroll;">
+<table id="appLeak-table" class="table table-striped table-bordered table-hover nomargin-bottom"
+	   style="width:2000px; table-layout: fixed">
+	  <thead>
+		<tr>
+			<th class="center" style="width:15%">appMD5值</th>
+			<th class="center" style="width:5%">漏洞ID</th>
+			<th class="center">漏洞名称</th>
+			<th class="center">漏洞代码</th>
+			<th class="center">漏洞描述</th>
+			<th class="center" style="width:5%">风险级别</th>
+			<th class="center">漏洞路径</th>
+			<th class="center">修复建议</th>
+			<th class="center">任务提交时间</th>
+		</tr>
+	  </thead>
+
+	  <tbody>
+		 @for(item in page.list){
+			<tr>
+				<td class="center">${item.appMd5!}</td>
+				<td class="center">${item.vulId!}</td>
+				<td class="center">${item.vulName!}</td>
+				<td class="center">${item.vulCode}</td>
+				<td class="center" title="${item.vulDesc}">${item.vulDesc!} </td>
+				<td class="center">${item.riskLevel!}</td>
+				<td class="center" title="${item.vulFilePath}">${item.vulFilePath!}</td>
+				<td class="center" title="${item.vulSolution}">${item.vulSolution!}</td>
+				<td class="center">${item.submitTime!}</td>
+			</tr>
+		@} 
+	  </tbody>
+</table>
+</div>
+<div class="space-8"></div>
+<#paginate page="${page}" formId="appLeak-search-form"/>
+<style>
+	table td{
+		white-space: nowrap;
+		text-overflow:ellipsis;
+		overflow: hidden;
+	}
+</style>
+<script>
+	$("#appLeak-table").rowspan(0);
+</script>

@@ -1,0 +1,144 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#checkCount"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 审核量统计排名
+		</a></li>
+		<li class="" onclick="checkEfficient()"><a data-toggle="tab" href="#checkEfficient"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 审核人员工作效率分析
+		</a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div id="checkCount" class="tab-pane active">
+			<#search>
+			<form action="${ctxPath}/check_count/list" method="post"
+				id="checkCount-search-form"  target="checkCount-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-3">
+						<label class="inline">账号：</label>
+						<select class="width-60" name="account">
+							<option value="">--请选择--</option>
+							@for(item in accounts){
+							<option value="${item}">${item.username}</option>
+							@}
+						</select>
+					</div>
+					<div class="col-sm-3">
+						<label class="inline">统计开始时间：</label> <input type="text"
+							class="width-80" name="dateStart" value="${startDefault!}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'})" readonly />
+					</div>
+					<div class="col-sm-3">
+						<label class="inline">统计结束时间：</label> <input type="text"
+							class="width-80" name="dateEnd"  value="${endDefault!}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'})" readonly />
+					</div>
+
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="checkCount-search-btn"
+							style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;"
+							value="条件查询" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="space-6"></div>
+			<div id="checkCount-list-page"></div>
+		</div>
+
+		<div id="checkEfficient" class="tab-pane">
+			<#search>
+			<form action="${ctxPath}/check_efficiency/checkEfficiency" method="post"
+				  id="checkEfficient-search-form" target="checkEfficient-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-3">
+						<label class="inline">审核人员账号：</label>
+						<select class="width-60" name="account">
+							<option value="">--请选择--</option>
+							@for(item in accounts){
+							<option value="${item.username}">${item.username}</option>
+							@}
+						</select>
+					</div>
+					<div class="col-sm-3">
+						<label class="inline">审核人员类型：</label>
+						<select class="center width-40" name="checkType">
+							<option value="">--请选择--</option>
+							<option value="0">全职</option>
+							<option value="1">兼职</option>
+						</select>
+					</div>
+					<div class="col-sm-2">
+						<label class="inline">审核数据源：</label>
+						<select class="center width-50" name="dataResource" onchange="showSecondLevelData()">
+							<option value="1">钓鱼</option>
+							<option value="2" id="buliang">不良</option>
+							<option value="3">域名备案</option>
+							<option value="4">欺诈情报</option>
+						</select>
+					</div>
+					<div class="col-sm-2" id="secondLevel" hidden>
+						<label class="inline">二级数据源：</label>
+						<select class="center width-50" name="secondLevelDataSource">
+							<option value="0">--全部--</option>
+							<option value="1">图片</option>
+							<option value="2">文本</option>
+							<option value="3">域名拨测</option>
+						</select>
+					</div>
+				</div>
+				<div class="row padding-tb-10">
+					<div class="col-sm-3">
+						<label class="inline">统计开始时间：</label>
+						<input type="text" value="${startDefault}" class="width-80" name="dateStart" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" readonly />
+					</div>
+					<div class="col-sm-3">
+						<label class="inline">统计结束时间：</label>
+						<input type="text" value="${endDefault}" class="width-80" name="dateEnd" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" readonly />
+					</div>
+
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="checkEfficient-search-btn" style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;"
+							   value="条件查询" readonly />
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="space-6"></div>
+			<div id="checkEfficient-list-page"></div>
+		</div>
+	</div>
+</div>
+<style>
+#checkCount input{background:#18202d;color:#fff;}
+#checkCount select{background:#18202d;color:#fff;}
+#checkEfficient input{background:#18202d;color:#fff;}
+#checkEfficient select{background:#18202d;color:#fff;}
+</style>
+<script>
+
+	$("#checkCount-search-form").getPageList({
+		'submitBtnId' : 'checkCount-search-btn'
+	});
+
+	function checkEfficient(){
+		$("#checkEfficient-search-form").getPageList({
+			'submitBtnId' : 'checkEfficient-search-btn'
+		})
+	}
+
+	function showSecondLevelData() {
+		if($("#buliang").is(":checked")){
+			$("#secondLevel").show();
+		}else{
+			$("#secondLevel").hide();
+		}
+	}
+
+	$(function() {
+		$("#fh").hide();
+		$("#sx").hide();
+		$("#tj").hide();
+	});
+</script>
+

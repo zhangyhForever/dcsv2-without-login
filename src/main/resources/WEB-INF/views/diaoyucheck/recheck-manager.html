@@ -1,0 +1,65 @@
+<div class="tabbable">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active">
+            <a data-toggle="tab" href="#recheck">
+                <i class="green ace-icon fa fa-users bigger-120"></i>  复查督办
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div id="recheck" class="tab-pane active clearfix">
+            <#search>
+            <form action="${ctxPath}/recheck/list" method="post" id="search-form" target="list-page" class="center clearfix">
+                <div class="row">
+                    <div class="col-sm-5">
+                        <label class="inline col-sm-2">状态：</label>
+                        <select id="status" name="status" class="width-20">
+                            <option value="">所有</option>
+                            <option value="1">已封堵</option>
+                            <option value="2">未封堵</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-5" style="margin-left: -30%">
+                        <label class="inline col-sm-2">类型：</label>
+                        <select id="types" name="types" class="width-20">
+                            <option value="">所有</option>
+                            <option value="1">图片</option>
+                            <option value="2">文本</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-5" style="margin-left: -25%">
+						<span
+                                class="btn btn-info btn-sm col-sm-4" id="search-btn">条 件 查 询</span>
+                        <span class="btn center btn-primary btn-sm col-sm-4"
+                              onclick="reForm('search-form','search-btn')">重 置</span>
+
+                        <a class="btn center btn-grey btn-sm col-sm-4"
+                                id="export" data-title="导出"
+                                data-width='50%'
+                                data-height='50%'
+                        >导 出
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </#search>
+        <div class="space-6"></div>
+        <div id="list-page"></div>
+    </div>
+</div>
+<style>
+    #profile .center>label {
+        width: 100px;
+        text-align: right;
+    }
+</style>
+<script>
+   $("#search-form").getPageList({'submitBtnId':'search-btn'});
+
+   $("#export").click(function(){
+       var status = $("#status").val();
+       var types = $("#types").val();
+       window.open("recheck/openExport?status="+status+"&types="+types);
+   })
+
+</script>

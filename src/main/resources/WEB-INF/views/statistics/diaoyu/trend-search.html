@@ -1,0 +1,233 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#domain"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 域名-时间趋势
+		</a></li>
+		<li class="" onclick="showIdCount()"><a data-toggle="tab" href="#ip"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> ip-时间趋势
+		</a></li>
+		<li class="" onclick="showSendCount()"><a data-toggle="tab" href="#sendCount"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 送审量变化趋势
+		</a></li>
+		<li class="" onclick="showCheckOut()"><a data-toggle="tab" href="#checkOut"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 检出量变化趋势
+		</a></li>
+	</ul>
+
+	<div id="tabContent" class="tab-content">
+		<div id="domain" class="tab-pane active">
+			<#search>
+			<form action="${ctxPath}/dyTrend/domainCountTrend" method="post" id="domain-search-form"
+				target="domain-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-6">
+						<label class="inline">起始日期：</label> <input type="text"
+							class="width-45" name="startDate" id="startDate" value="${startDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="endDate" id="endDate" value="${endDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">欺诈类型：</label> 
+						<select class="width-45" name="type" id="type">
+							<option value="">全部</option>
+							@for(item in types){
+								<option value="${item}">${item}</option>
+							@}
+						</select>
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="domain-search-btn" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="domain-export-btn" onclick="exportData(this);" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:20px;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="list" id="domain-list-page" style="height:63vh"></div>
+		</div>
+		<div id="ip" class="tab-pane">
+			<#search>
+			<form action="${ctxPath}/dyTrend/ipCountTrend" method="post" id="ip-search-form"
+				target="ip-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-6">
+						<label class="inline">起始日期：</label> <input type="text"
+							class="width-45" name="startDate" id="startDate" value="${startDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="endDate" id="endDate" value="${endDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">欺诈类型：</label> 
+						<select class="width-45" name="type" id="type">
+							<option value="">全部</option>
+							@for(item in types){
+								<option value="${item}">${item}</option>
+							@}
+						</select>
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="ip-search-btn" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="ip-export-btn" onclick="exportData(this);" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:20px;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="list" id="ip-list-page" style="height:63vh"></div>
+		</div>
+		<div id="sendCount" class="tab-pane">
+			<#search>
+			<form action="${ctxPath}/dyTrend/sendCountTrend" method="post" id="send-search-form"
+				target="send-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-6">
+						<label class="inline">起始日期：</label> <input type="text"
+							class="width-45" name="startDate" id="startDate" value="${startDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="endDate" id="endDate" value="${endDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">欺诈类型：</label> 
+						<select class="width-45" name="type" id="type">
+							<option value="">全部</option>
+							@for(item in types){
+								<option value="${item}">${item}</option>
+							@}
+						</select>
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="send-search-btn" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="send-export-btn" onclick="exportData(this);" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:20px;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="list" id="send-list-page" style="height:63vh"></div>
+		</div>
+		<div id="checkOut" class="tab-pane">
+			<#search>
+			<form action="${ctxPath}/dyTrend/checkCountTrend" method="post" id="check-search-form"
+				target="check-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-6">
+						<label class="inline">起始日期：</label> <input type="text"
+							class="width-45" name="startDate" id="startDate" value="${startDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="endDate" id="endDate" value="${endDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">欺诈类型：</label>
+						<select class="width-45" name="type" id="type">
+							<option value="">全部</option>
+							@for(item in types){
+								<option value="${item}">${item}</option>
+							@}
+						</select>
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="check-search-btn" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="check-export-btn" onclick="exportData(this);" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:20px;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="list" id="check-list-page" style="height:63vh"></div>
+		</div>
+	</div>
+</div>
+<style>
+#home input{background:#18202d;color:#fff;}
+#home select{background:#18202d;color:#fff;}
+.table thead tr {
+	display:block;
+}
+.table tbody {
+	display: block;
+	height: 40vh;
+	overflow: auto;
+}
+.table th {
+	width:9%;
+}
+.table td {
+    width:8%;
+}
+</style>
+<script>
+	$(function(){
+		$("#sx").hide();
+		$("#tj").hide();
+		$("#domain-search-form").getPageList({
+			'submitBtnId' : 'domain-search-btn'
+		});
+	})
+
+	//显示IP变化趋势
+	function showIdCount(){
+		$("#ip-search-form").getPageList({
+			'submitBtnId' : 'ip-search-btn'
+		});
+	}
+	
+	//显示送审量变化趋势
+	function showSendCount(){
+		$("#send-search-form").getPageList({
+			'submitBtnId' : 'send-search-btn'
+		});
+	}
+	
+	//显示检出量变化趋势
+	function showCheckOut(){
+		$("#check-search-form").getPageList({
+			'submitBtnId' : 'check-search-btn'
+		}); 
+	}
+
+	//导出表格数据
+	function exportData(thiz){
+		var id = $(thiz).attr("id");
+		var table = $(thiz).parents(".tab-pane").children(".list").children("div").children("table");
+		var tableId = table.attr("id");
+		if(table.is(":hidden")){
+			alert("没有相关数据！");
+			return;
+		}
+		//获取当前子页面的标题内容
+		var title = $(thiz).parents(".tabbable").children("ul").children(".active").text().trim();
+		var startDate = $("#startDate").val();
+		var endDate = $("#endDate").val();
+		title = title + "(" + startDate + "至" + endDate + ")";
+		$("#"+tableId).table2excel({
+			exclude: ".noExl",
+            filename: title,
+            exclude_img: true,
+            exclude_links: true,
+            exclude_inputs: true
+		});
+	}
+	//数组反转
+	function reverse(oriArr){
+		var arr = [];
+		if(oriArr.length<=1){
+			return oriArr;
+		}
+		for(var i=oriArr.length-1; i>=0; i--){
+			arr.push(oriArr[i]);
+		}
+		return arr;
+	}
+</script>

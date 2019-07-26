@@ -1,0 +1,69 @@
+<div class="tabbable">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a data-toggle="tab" href="#home"> <i
+                class="green ace-icon fa fa-users bigger-120"></i> app漏洞详情
+        </a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane active clearfix">
+            <#search>
+            <form action="${ctxPath}/appLeak/list" method="post" id="appLeak-search-form" target="appLeak-list-page"
+                  class="center clearfix">
+                <div class="row">
+                    <div class="col-sm-4" style="width: 40%">
+                        <label class="inline">提交时间：</label>
+                        <input type="text" class="width-35 Wdate" id="beginTime"name="beginTime" value="${beginTime}"
+                              onClick="WdatePicker({dateFmt:'yyyy-MM-dd 00:00:00',maxDate:'%y-%M-{%d}'})" readonly/>
+                        &nbsp;至&nbsp;
+                        <input type="text" class="width-35 Wdate" name="endTime" value="${endTime}" readonly
+                               onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'beginTime\')}'})"/>
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="inline">风险级别：</label>
+                        <select  class="width-50" name="riskLevel">
+                            <option value="">--请选择--</option>
+                            <option value="高风险">高风险</option>
+                            <option value="中风险">中风险</option>
+                            <option value="低风险">低风险</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="inline">漏洞名称：</label>
+                        <input type="text" class="width-80" name="vulName"/>
+                    </div>
+                </div>
+                <div class="row padding-tb-10">
+                    <div class="col-sm-8">
+				        <span
+                        class="btn btn-info btn-sm col-sm-3" id="appLeak-search-btn">条 件 查 询</span>
+                        <span class="btn center btn-primary btn-sm col-sm-3"
+                              onclick="reForm('appLeak-search-form','appLeak-search-btn',this)">重 置</span>
+
+                        <!--<a class="btn btn-info btn-sm col-sm-3" id="export"
+                           data-mode="detail" data-title="导出"
+                           data-url="${ctxPath}/soft/openExport"
+                           data-width='50%'
+                           data-height='50%'
+                        >导 出
+                        </a>-->
+                    </div>
+                </div>
+            </form>
+        </#search>
+        <div class="space-6"></div>
+        <div id="appLeak-list-page"></div>
+    </div>
+</div>
+<style>
+    #profile .center > label {
+        width: 100px;
+        text-align: right;
+    }
+</style>
+
+<script>
+
+    $("#appLeak-search-form").getPageList({'submitBtnId': 'appLeak-search-btn'});
+
+</script>

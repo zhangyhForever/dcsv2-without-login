@@ -1,0 +1,94 @@
+<style type="text/css">
+#settingRadio input {
+	-webkit-appearance: radio;
+	vertical-align: middle;
+	margin-top: 0;
+}
+</style>
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href=""> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 拨测配置
+		</a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div class="center padding-10">
+			<form action="${ctxPath}/dialTest/setTime" method="post"
+				id="dial-form" target="list-page" class="center clearfix">
+				<fieldset align="left">
+					 	<legend class="upload-legend white">定时设置</legend>
+					<div class="col-sm-6">
+						<label class="inline">拨测时间：</label> <input type="text"
+							class="width-80" name="submitTime" value="${submitTime}"
+							onClick="WdatePicker({dateFmt:'HH:mm:00'})" readonly />
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="dial-btn"
+							style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;"
+							value="保存" readonly />
+					</div>
+				</fieldset>
+			</form>
+		</div>
+		<div class="space-8"></div>	
+		<div class="center padding-10">
+			<form action="${ctxPath}/dialTest/saveSettings" id="setting-save-form" method="post">
+				<fieldset align="left">
+				 	<legend class="upload-legend white">拨测设置</legend>
+				 	<!-- 设置选择树 -->
+             	 	<!-- <div id="settingTree" class="col-sm-6">
+             	 		<#treeselect url="dialTest/settingMenu" checked="true" isLayer="false" rootNodeName="全部域名"
+							class="width-50" treeSelectId="settingTree" selectIds="${settingsIds!}" chkboxType="1">
+							<div id="settingTree" style="width: 40%;display: inline-block;vertical-align: top;float: left"></div>
+						</#treeselect>
+					</div> -->
+					<div id="settingRadio" class="col-sm-3">
+						<input id="all" name="dialTest" type="radio" value="10" /><label for="all">全部域名</label></br>
+						<input id="test" name="dialTest" type="radio" value="1"/><label for="test">已检测域名</label>&nbsp;&nbsp;
+						<input id="noTest" name="dialTest" type="radio" value="2"/><label for="noTest">未检测域名</label></br>
+						<input id="redirected" name="dialTest" type="radio" value="3"/><label for="redirected">有跳转域名</label>&nbsp;&nbsp;
+						<input id="noRedirected" name="dialTest" type="radio" value="4"/><label for="noRedirected">无跳转域名</label></br>
+						<input id="normal" name="dialTest" type="radio" value="7"/><label for="normal">正常域名</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<input id="bad" name="dialTest" type="radio" value="8"/><label for="bad">不良域名</label>
+					</div>
+					<div class="col-sm-3">
+						<input id="seeting-save-btn" type="type" value="保存" readonly
+						style="width: 110px;height: 33px;cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;"/>
+					</div>
+				</fieldset>
+			</form>
+ 		</div>
+	</div>
+</div>
+<!-- 设置选择数 -->
+<!-- <#save isHide="yes" subBtnId="seeting-save-btn" formId="setting-save-form" config="true" validId="settingForm" reloadUrl="true">
+	var chkSetting = getCheckbox(settingTree);
+	var data = $("setting-save-form").serialize()+"&settingIds="+chkSetting;
+	settingForm.config({
+		 ajaxpost:{
+			 data:data
+		 }
+	});
+</#save> -->
+
+<#save isHide="yes" subBtnId="dial-btn" formId="dial-form" reloadUrl="true"/>
+<#save isHide="yes" subBtnId="seeting-save-btn" formId="setting-save-form" reloadUrl="true"/>
+<script>
+	$(function() {
+		$("#sx").hide();
+		$("#tj").hide();
+		$("#fh").hide();
+	}); 
+	
+	$(function() {
+		var id = ${settingsId};
+		$("#settingRadio input").each(function(){
+			if($(this).val() == id){
+				console.log($(this));
+				$(this).attr("checked", "true");
+			}
+		})
+	})
+</script>
+

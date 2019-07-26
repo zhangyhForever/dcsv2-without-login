@@ -1,0 +1,64 @@
+<div class="layer" style="width:600px;">
+	<form name="FormPost" id="redirected-save" class="FormGrid"  method="post"
+		action="${ctxPath}/audit/redirected/addRedirected">
+		<table class="EditTable" width="100%">
+			<tbody>
+				<tr class="FormData" hidden>
+					<td class="DataTD">
+					<input id="auditId" type="text" value="${audit.auditId!}" name="auditId" readonly="readonly" />
+					</td>
+				</tr>
+				<tr class="FormData" hidden>
+					<td class="DataTD">
+					<input type="text" value="${audit.submitTime!}" name="submitTime" readonly="readonly" />
+					</td>
+				</tr>
+				<tr class="FormData" hidden>
+					<td class="DataTD">
+					<input type="text" value="${audit.taskId!}" name="taskId" readonly="readonly" />
+					</td>
+				</tr>
+				<tr class="FormData">
+					<td class="CaptionTD">原始域名:</td>
+					<td class="DataTD">
+					<input type="text" value="${audit.oriHost!}" name="oriHost" readonly="readonly" />
+					</td>
+				</tr>
+				<tr class="FormData">
+					<td class="CaptionTD">跳转域名:</td>
+					<td class="DataTD width-100">
+					<input type="text" name="finalHost" datatype="url"  nullmsg="请输入跳转url"/>
+					</td>
+				</tr>
+				<tr class="FormData">
+					<td class="CaptionTD">是否违规:</td>
+					<td>
+					<input id="yes" type="radio"  name="dangerous" value="8"/>
+					<label for="yes">违规</label>&nbsp;&nbsp;
+					<input id="no" type="radio"  name="dangerous" checked value="7"/>
+					<label for="no">正常</label>&nbsp;&nbsp;
+					<input id="unconfirm" type="radio"  name="dangerous" value="78"/>
+					<label for="unconfirm">不确定</label>&nbsp;&nbsp;
+					<input id="disable" type="radio"  name="dangerous" value="39"/>
+					<label for="disable">  页面失效</label>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
+<#save formId="redirected-save" reloadUrl="false" callBack="confirm($('#auditId').val())"/>
+<style>
+	input[type="radio"]{
+		vertical-align:middle;
+		margin-top:0;
+		-webkit-appearance: radio
+	}
+</style>
+<script>
+//确定有跳转
+function confirm(auditId){
+	$("#"+auditId).children("a").eq(0).attr("class", "red");
+	$("#"+auditId).children("a").eq(1).attr("class", "green");
+}
+</script>

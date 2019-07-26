@@ -1,0 +1,48 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#home"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 数据导出
+		</a></li>
+	</ul>
+	<div class="tab-content">
+		<div id="home" class="tab-pane active clearfix">
+			<#search>
+			<form action="${ctxPath}/dialStatistic/statistic_list" method="post" id="search-form"
+				target="list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-5">
+						<label class="inline">审核日期：</label> 
+						<input type="text" class="width-30" name="startDate" value="${startDate}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:00'})" readonly />
+						&nbsp;至&nbsp;&nbsp;
+						<input type="text" class="width-30" name="endDate" value="${endDate}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:00'})" readonly />
+					</div>
+					<div class="col-sm-2">
+						    <input type="text" class="width-45" id="search-btn" style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;" value="条件查询" readonly/>
+							<a href="javascript:void(0);" class="width-45" >
+							<input type="text" id="export-btn" value="导出数据" class="width-45" style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;" readonly/>
+						</a>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div id="list-page"></div>
+		</div>
+	</div>
+</div>
+<script>
+	$("#search-form").getPageList({
+		'submitBtnId' : 'search-btn'
+	});
+
+	//数据导出
+	$("#export-btn").click(function(){
+		$("#dialTable").table2excel({
+			exclude: ".noExl",
+			filename: "湖南省审核情况统计"+new Date().format("yyyyMMddhhmmss"),
+			exclude_img: true,
+			exclude_links: true,
+			exclude_inputs: true
+		});
+	});
+</script>
+

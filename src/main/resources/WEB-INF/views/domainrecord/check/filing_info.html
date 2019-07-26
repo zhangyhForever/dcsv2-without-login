@@ -1,0 +1,174 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#home"> <i
+				class="green ace-icon fa fa-users bigger-120"></i>数据审核 </a></li>
+	</ul>
+	<div class="tab-content">
+		<div id="home" class="tab-pane active clearfix">
+			<#search>
+			<form action="${ctxPath}/domainCheck/list" method="post"
+				id="search-form" target="list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-8">
+						<label class="col-sm-6" style="font-size:14.5px;">查询字段：</label> <select
+							id="example-radio" class="col-sm-3" name="param">
+							<option value="0" selected="selected">-请选择-</option>
+							<option value="mastercode">主备案号</option>
+							<option value="reviewdate">审核通过时间</option>
+							<option value="sponsor">主办单位名称</option>
+							<option value="nature">主办单位性质</option>
+							<option value="name">网站名称</option>
+							<option value="page">网站首页</option>
+							<option value="chargeperson">负责人</option>
+							<option value="domain">网站域名</option>
+							<option value="code">备案号</option>
+						</select>
+						<label class="col-sm-2" style="font-size:14.5px;">查询信息：</label>
+						<input class="col-sm-4" type="text" id="input_1" name="input_1" placeholder="请输入具体选择信息" />
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="search-btn"
+								style="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;font-size:14.5px;"
+								value="条件查询" readonly />
+						<a href="javascript:batchOperation();" class="width-45"
+							style="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;"><input
+							data-target="#myModal"
+							data-toggle="modal" type="text" class="width-45"
+							style="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;font-size:14.5px;"
+							value="批量操作" readonly /> </a>
+					</div>
+					
+					<!-- 模态框（Modal）-->
+					<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+						 aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog" style="width: 550px;border:3px solid #B0B0B0;border-radius: 6px;">
+							<div class="modal-content">
+								<div class="modal-header"
+									 style="background:linear-gradient(rgb(255, 255, 255) 0px, rgb(238, 238, 238) 100%) repeat-x rgb(247, 247, 247);height:40px;padding-top:5px;">
+									<button type="button" class="close" data-dismiss="modal"
+											aria-hidden="true">&times;</button>
+									<h4 class="modal-title" id="myModalDelLabel"
+										style="font-family: 'Microsoft YaHei', '微软雅黑', 'Microsoft JhengHei';font-style: normal;text-align: center;background:linear-gradient(rgb(255, 255, 255) 0px, rgb(238, 238, 238) 100%) repeat-x rgb(247, 247, 247);color: rgb(102, 159, 199);">
+										<em>批量操作</em>
+									</h4>
+								</div>
+								<div class="modal-body"
+									 style="background-color: rgb(255, 255, 255); z-index: 19891015; height: 200px;">
+									<div class="row" style="margin-top:-20px;">
+											<div class="alert alert-info">
+												<font color="#69AA46" style="font-family:"微软雅黑";"><i class="fa fa-circle"></i>&nbsp操作说明</font><br><br>
+												<font color="#F7A157" style="font-family:"微软雅黑";"><i class="fa fa-exclamation-triangle"></i>&nbsp;注意：（1）该批量操作只是为将审核数据批量定位到未备案的统计界面！<br/>（2）目前只提供按照审核界面页码进行批量操作,且开始页码只允许从第一页开始</font>
+											</div>
+											<div>
+												从第<input type="text" id="startPage" size="10px" value="1" style="border:none;text-align: center;" readlony/>&nbsp;&nbsp;页到&nbsp;&nbsp;<input type="text" id="endPage" size="10px"/>&nbsp;&nbsp;页
+											</div>
+											
+									</div>
+								</div>
+								<div style="background-color:white;height:40px;">
+									<div class="width-100 clearfix"
+										 style="bottom: 0px;left: 0px;position:absolute;">
+										<div style="cursor:pointer;">
+											<span id="ok" class="ok">
+												<a class="xubox_botton2" id="btn_ok_1">确定</a>
+												<a class="xubox_botton3" id="btn_close_1" data-dismiss="modal">取消</a>
+											</span></div>
+										<div></div>
+									</div>
+								</div>
+							</div>
+							<!-- /.modal-content -->
+						</div>
+						<!-- /.modal -->
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="space-6"></div>
+			<div id="list-page"></div>
+		</div>
+	</div>
+</div>
+<script>
+	$("#search-form").getPageList({
+		'submitBtnId' : 'search-btn'
+	});
+	
+	  //模态框居中显示
+    $('#myModal').on(
+        'show.bs.modal',
+        function(e) {
+            // 关键代码，如没将modal设置为 block，则$modala_dialog.height() 为零
+            $(this).css('display', 'block');
+            var modalHeight = $(window).height() / 2
+                - $('#myModal .modal-dialog').height() / 2;
+            $(this).find('.modal-dialog').css({
+                'margin-top' : modalHeight
+            });
+        });
+     
+        
+	 //点击确定后的批量操作
+    $("#btn_ok_1").click(function() {//批量
+        //获得页码值
+        var	startPage=$("#startPage").val().trim();
+        var	endPage=$("#endPage").val().trim();
+        if(checkPage(startPage,endPage)){
+        	$.ajax({
+	            type : "POST",
+	            url : "${ctxPath}/Check/batchCheck/result_data",
+	            dataType : 'json',
+	            async: false,
+	            data : {
+	                "startPage" :startPage,
+	                "endPage":endPage
+	            },
+	            success : resutlMsg,
+	            error : errorMsg,
+	            complete:function(XMLHttpRequest,textStatus){
+	            //隐藏遮罩层
+	              $("#myModal").modal("hide");
+	       		}
+        	});
+	        function resutlMsg(msg) {
+	            if(msg.message=="0"){
+	                msgAlert(5,"操作失败");
+	                return false;
+	            }
+	          //局部刷新，不能使用$("#search-form").getPageList({'submitBtnId':search-btn'});
+				//因为会造成二次刷新
+	          $("#search-btn").trigger('click');
+	            //全局刷新后隐藏遮罩层
+	           $(".modal-backdrop").remove();
+	        }
+	        function errorMsg(XMLHttpRequest,textStatus,errorThrown) {
+	            msgAlert(5,"操作失败了呀");
+	        }
+        }
+    });
+     //验证输入数据
+     function checkPage(startPage,endPage){
+	     //判断是否数字
+	     var reg =  /^\+?[1-9][0-9]*$/;
+	     if(!reg.test(startPage)||!reg.test(endPage)){
+		     msgAlert(5,"填写正确的数字页码");
+		     return false;
+	     }
+	     //判断数字后边比前边大
+	     if(endPage<startPage){
+		     msgAlert(5,"后面页码应该比前面页码大");
+		     return false;
+	     }
+     	 return true;
+     }
+</script>
+<style type="text/css">
+	/*定位确定框  */
+	.ok a{position:absolute; bottom:10%; left:20%; background:url(${ctxPath}/static/layer/skin/default/xubox_ico0.png) repeat; text-decoration:none; color:#FFF;  font-size:14px;  text-align:center; font-weight:bold; overflow:hidden; }
+	.ok a:hover{text-decoration:none; color:#FFF; }
+	.ok .xubox_botton2{margin-left:30px;margin-bottom:8px; width:61px; height:29px; line-height:29px; background-position:-5px -114px;}
+	.xubox_botton2:hover{ background-position:-5px -146px;}
+	/*定位取消按钮  */
+	.ok .xubox_botton3{margin-left:220px;margin-bottom:8px; width:61px; height:29px; line-height:29px; background-position:-81px -114px;}
+	.xubox_botton3:hover{ background-position:-81px -146px;}
+</style>

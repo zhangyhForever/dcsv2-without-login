@@ -1,0 +1,151 @@
+<div id="terrianEchart" style="width: 50%; height: 390px; float: left; display: ''; "></div>
+<div style="width: 50%; height: 250px; float: right ; overflow: auto; margin-top:90px; display: ''; ">
+<table id="sendTable" class="table table-striped table-bordered table-hover nomargin-bottom">
+		<thead>
+			<tr>
+				<th class="center" style="width:7%">地市</th>
+				<th class="center" style="width:7%">数量</th>
+			</tr>
+		</thead>
+		<tbody>
+				<tr>
+					<td class="center">广州</td>
+					<td class="center">15</td>
+				</tr>
+				<tr>
+					<td class="center">上海</td>
+					<td class="center">10</td>
+				</tr>
+				<tr>
+					<td class="center">浙江</td>
+					<td class="center">4</td>
+				</tr>
+				<tr>
+					<td class="center">杭州</td>
+					<td class="center">3</td>
+				</tr>
+				<tr>
+					<td class="center">北京</td>
+					<td class="center">2</td>
+				</tr>
+		</tbody>
+	</table>
+	</div>
+<script>
+var terrian = ['广州','上海','浙江','杭州','北京'];
+var count = [15,10,4,3,3]
+ var terrianArr = new Array();
+ for(var i=0; i<5; i++){
+	 terrianArr.push({"value":count[i],"name":terrian[i]})
+ }
+			var myChart1 = echarts.init(document.getElementById("terrianEchart"));
+			var rich = {
+			    yellow: {
+			        color: "#ffc72b",
+			        fontSize: 12 * scale,
+			        padding: [5, 4],
+			        align: 'center'
+			    },
+			    total: {
+			        color: "#ffc72b",
+			        fontSize: 40 * scale,
+			        align: 'center'
+			    },
+			    white: {
+			        color: "#fff",
+			        align: 'center',
+			        fontSize: 14 * scale,
+			        padding: [21, 0]
+			    },
+			    blue: {
+			        color: '#49dff0',
+			        fontSize: 12 * scale,
+			        align: 'center'
+			    },
+			    hr: {
+			        borderColor: '#0b5263',
+			        width: '100%',
+			        borderWidth: 1,
+			        height: 0,
+			    }
+			}
+			option = {
+			    title: {
+			        text:'topn总数',
+			        left:'center',
+			        top:'51%',
+			        padding:[24,0],
+			        textStyle:{
+			            color:'#fff',
+			            fontSize:16*scale,
+			            align:'center'
+			        }
+			    },
+			    toolbox: {  
+					show : true,  
+					feature : {  
+						mark : {show: true},  
+						dataView : {show: true, readOnly: false},  
+						restore : {show: true},  
+						saveAsImage : {show: true,backgroundColor : 'black'}
+					},
+					x:"right",
+					y:"bottom"
+				},
+			    legend: {
+			        selectedMode:false,
+			        formatter: function(name) {
+			            var total = 0; 
+			            var averagePercent; 
+			            terrianArr.forEach(function(value, index, array) {
+			                total += value.value;
+			            });
+			            return '{total|' + total + '}';
+			        },
+			        data: [terrianArr[0].name],
+			        left: 'center',
+			        top: 'center',
+			        icon: 'none',
+			        align:'center',
+			        textStyle: {
+			            color: "#fff",
+			            fontSize: 16 * scale,
+			            rich: rich
+			        },
+			    },
+			    series: [{
+			        type: 'pie',
+			        radius: ['42%', '50%'],
+			        hoverAnimation: false,
+			        minAngle: 5,           　　 //最小的扇区角度（0 ~ 360），用于防止某个值过小导致扇区太小影响交互
+			        avoidLabelOverlap: true,   //是否启用防止标签重叠策略
+			        color: ['#c487ee', '#deb140', '#49dff0', '#034079', '#6f81da', '#00ffb4'],
+			        label: {
+			            normal: {
+			                formatter: function(params, ticket, callback) {
+			                    var total = 0; 
+			                    var percent = 0; 
+			                    terrianArr.forEach(function(value, index, array) {
+			                        total += value.value;
+			                    });
+			                    percent = ((params.value / total) * 100).toFixed(1);
+			                   
+			                    return '{white|' + params.name + '}{yellow|(}{blue|' + percent + '%}{yellow|)}';
+			                },
+			                rich: rich
+			            },
+			        },
+			        labelLine: {
+			            normal: {
+			                length: 30 * scale,
+			                length2: 10,
+			                lineStyle: {
+			                    color: '#0b5263'
+			                }
+			            }
+			        },
+			        data: terrianArr
+			    }]
+			}; 
+			myChart1.setOption(option);
+</script>

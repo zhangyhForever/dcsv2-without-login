@@ -1,0 +1,383 @@
+<div class="tabbable">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a data-toggle="tab" href="" id="phoneManager"> <i
+                class="green ace-icon fa fa-users bigger-120"></i> app漏洞趋势分析
+        </a></li>
+    </ul>
+
+    <div class="tab-content" style="height: 87vh; overflow: auto">
+        <div id="alert" style="text-align:center;font-size:30px;color:#F00;margin-top:60px; margin-bottom: 60px;">
+        </div>
+        <hr/>
+        <br>
+        <br>
+        <div style="height:400px;">
+            <div id="riskLevelPie" style="height:400px;width:45%;margin-left:20px;float:left;"></div>
+            <div id="vulNamePie" style="height:400px;width:45%;margin-right:20px;float:right;"></div>
+        </div>
+        <br>
+        <br>
+        <hr/>
+        <br>
+        <br>
+        <div style="height:430px;margin-top:50px;">
+            <div id="levelTrend" style="height:400px;width:45%;margin-left:20px;float:left;"></div>
+            <div id="vulNameTrend" style="height:400px;width:45%;margin-right:20px;float:right;"></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $.ajax({
+        url: 'appLeak/levelCount',
+        type: 'POST',
+        success: function (data) {
+            var riskCountArr = JSON.parse(data);
+            var riskName = [];
+            $.each(riskCountArr, function (index, value) {
+                riskName.push(value.name);
+            });
+
+            var riskLevelPie = echarts.init(document.getElementById("riskLevelPie"));
+
+            //漏洞风险级别分布
+            option_riskLevel = {
+                animation: true,
+                color: ['#14ff36', '#CDC9C9', '#ff2724'],
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{b}:<br/>{c} ({d}%)"
+                },
+                title: {
+                    text: 'app漏洞风险级别分布',
+                    x: 'center',
+                    textStyle: {
+                        color: '#c0c0c0'
+                    }
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: '5%',
+                    y: '10%',
+                    textStyle: {
+                        color: '#c0c0c0'
+                    },
+                    data: riskName,
+                },
+                series: [
+                    {
+                        name: '',
+                        type: 'pie',
+                        radius: '60%',
+                        center: ['50%', '60%'],
+                        cursor: 'pointer',
+                        data: riskCountArr,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            riskLevelPie.setOption(option_riskLevel);
+
+        }
+    });
+
+    $.ajax({
+        url: 'appLeak/vulNameCount',
+        type: 'POST',
+        success: function (data) {
+            var vulNameCountArr = JSON.parse(data);
+            var vulName = [];
+            var selected = {};
+            $.each(vulNameCountArr, function (index, value) {
+                vulName.push(value.name);
+                selected[value.name] = index < 8;
+            });
+            var vulNamePie = echarts.init(document.getElementById("vulNamePie"));
+            //漏洞名称分布
+            option_vulName = {
+                animation: true,
+                color: ['#05d58d', '#23b7ff', '#FFFF00', '#FF8C00', '#FF0000', '#FE8463'],
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{b}:<br/>{c} ({d}%)"
+                },
+                title: {
+                    text: 'app漏洞分布',
+                    x: 'center',
+                    textStyle: {
+                        color: '#c0c0c0'
+                    }
+                },
+                legend: {
+                    type: 'scroll',
+                    orient: 'horizontal',
+                    x: '5%',
+                    y: '10%',
+                    data: vulName,
+                    textStyle: {
+                        color: '#c0c0c0'
+                    },
+                    selected: selected
+                },
+                series: [
+                    {
+                        name: '',
+                        type: 'pie',
+                        radius: '60%',
+                        center: ['50%', '60%'],
+                        cursor: 'pointer',
+                        data: vulNameCountArr,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            vulNamePie.setOption(option_vulName);
+        }
+    });
+
+    var date = new Array(7);
+    for (var i = 0, j = 6; i < 7; i++, j--) {
+        date[j] = (getDateStr(i, true))
+    }
+    $.ajax({
+        url: 'appLeak/levelCountByDay',
+        type: 'POST',
+        success: function (data) {
+
+            var levelCountByDay = JSON.parse(data);
+            var highLevel = [0, 0, 0, 0, 0, 0, 0];
+            var middleLevel = [0, 0, 0, 0, 0, 0, 0];
+            var lowLevel = [0, 0, 0, 0, 0, 0, 0];
+
+            var count = 0;
+            for (var i = 0; i < date.length; i++) {
+                $.each(levelCountByDay, function (index, value) {
+                    var date0 = new Date(value.date).format("yyyy-MM-dd");
+                    if (date0 !== date[i]) {
+                        return;
+                    }
+                    count++;
+                    var riskLevel = value.riskLevel.split(",");
+                    var levelCount = value.count.split(",");
+                    for (var j = 0; j < riskLevel.length; j++) {
+                        if ("高风险" === riskLevel[j]) {
+                            highLevel[i] = levelCount[j]
+                        } else if ("中风险" === riskLevel[j]) {
+                            middleLevel[i] = levelCount[j]
+                        } else if ("低风险" === riskLevel[j]) {
+                            lowLevel[i] = levelCount[j]
+                        }
+                    }
+                });
+            }
+            var levelTrend = echarts.init(document.getElementById("levelTrend"));
+            //一周风险类别趋势
+            var levelTrend_option = {
+                animation: true,
+                tooltip: {
+                    trigger: 'axis'
+                },
+                color: ['#05d58d', '#FFFF00', '#FE8463'],
+                title: {
+                    x: 'center',
+                    text: '一周危险等级数量趋势',
+                    textStyle: {
+                        color: '#c0c0c0'
+                    }
+                },
+                legend: {
+                    y: '10%',
+                    data: ['高风险', '中风险', '低风险'],
+                    textStyle: {
+                        color: ['#05d58d', '#FFFF00', '#FE8463']
+                    }
+                },
+                grid: {
+                    x: '12%',
+                    y: '20%',
+                    x2: '8%',
+                    y2: '15%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: date,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: -30,
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 10
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 10
+                        }
+                    }
+                },
+                series: [{
+                    name: '高风险',
+                    data: highLevel,
+                    type: 'line'
+                }, {
+                    name: '中风险',
+                    data: middleLevel,
+                    type: 'line'
+                }, {
+                    name: '低风险',
+                    data: lowLevel,
+                    type: 'line'
+                }]
+            };
+            levelTrend.setOption(levelTrend_option);
+
+        }
+    });
+
+
+    function alertVulName(top5Vul) {
+        var sum = 0;
+        for(var i=0; i<top5Vul.length; i++){
+            sum += top5Vul[i].count;
+        }
+        var name = top5Vul[0].vulName;
+        var percent = Math.round(top5Vul[0].count*10000/sum)/100;
+        $("#alert").html("近期&nbsp;&nbsp;"+name+"&nbsp;&nbsp;出现频率较高，占比"+percent+"%，请注意防范");
+    }
+
+    $.ajax({
+        url: 'appLeak/vulNameCountByDay',
+        type: 'POST',
+        success: function (data) {
+            //漏洞top5的名称及数量
+            var top5Vul = JSON.parse(data).top5Vul;
+            //top5每个漏洞一周每天的数量
+            var vulNameCountByDay = JSON.parse(data).vulNameCountByDay;
+            //漏洞top5的名称
+            var vulNames = [];
+            //top5每个漏洞对应的个数
+            var vulNameCount = [];
+
+            //初始化map，存放每个漏洞一周中每天的数量
+            var nameMapping = new Map();
+            for (var i = 0; i < top5Vul.length; i++) {
+                vulNames.push(top5Vul[i].vulName);
+                vulNameCount.push(top5Vul[i].count);
+                var vulNameCount = [0, 0, 0, 0, 0, 0, 0];
+                nameMapping.set(top5Vul[i].vulName, vulNameCount);
+            }
+
+            //找出top5中占比最高的漏洞名称，并计算其占比
+            alertVulName(top5Vul);
+
+            for (var i = 0; i < date.length; i++) {
+                $.each(vulNameCountByDay, function (index, value) {
+                    var date0 = new Date(value.date).format("yyyy-MM-dd");
+                    if (date[i] !== date0) {
+                        return;
+                    }
+
+                    var vulNameArr = value.vulName.split(",");
+                    var vulNameCountArr = value.count.split(",");
+                    for (var j = 0; j < vulNameArr.length; j++) {
+                        if (nameMapping.get(vulNameArr[j])) {
+                            nameMapping.get(vulNameArr[j])[i] = vulNameCountArr[j];
+                        }
+                    }
+                });
+            }
+
+            var vulNameTrend = echarts.init(document.getElementById("vulNameTrend"));
+            //一周名称趋势
+            var vulNameTrend_option = {
+                animation: true,
+                tooltip: {
+                    trigger: 'axis'
+                },
+                color: ['#05d58d', '#FFFF00', '#FE8463', '#8f23aa', '#2b30bb'],
+                title: {
+                    x: 'center',
+                    text: '一周top5每天数量变化趋势',
+                    textStyle: {
+                        color: '#c0c0c0'
+                    }
+                },
+                legend: {
+                    x: '5%',
+                    y: '10%',
+                    type: 'scroll',
+                    orient: 'horizontal',
+                    data: vulNames,
+                    textStyle: {
+                        color: ['#05d58d', '#FFFF00', '#FE8463', '#8f23aa', '#2b30bb']
+                    }
+                },
+                grid: {
+                    x: '12%',
+                    y: '20%',
+                    x2: '8%',
+                    y2: '15%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: date,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: -30,
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 12
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 12
+                        }
+                    }
+                },
+                series: [{
+                    name: top5Vul[0].vulName,
+                    data: nameMapping.get(top5Vul[0].vulName),
+                    type: 'line'
+                }, {
+                    name: top5Vul[1].vulName,
+                    data: nameMapping.get(top5Vul[1].vulName),
+                    type: 'line'
+                }, {
+                    name: top5Vul[2].vulName,
+                    data: nameMapping.get(top5Vul[2].vulName),
+                    type: 'line'
+                }, {
+                    name: top5Vul[3].vulName,
+                    data: nameMapping.get(top5Vul[3].vulName),
+                    type: 'line'
+                }, {
+                    name: top5Vul[4].vulName,
+                    data: nameMapping.get(top5Vul[4].vulName),
+                    type: 'line'
+                }]
+            };
+            vulNameTrend.setOption(vulNameTrend_option);
+        }
+    });
+</script>

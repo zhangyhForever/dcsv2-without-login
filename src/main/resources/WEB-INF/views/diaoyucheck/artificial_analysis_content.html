@@ -1,0 +1,218 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#home"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 人工研判
+		</a></li>
+		<li style="float: right"><input id="unCheck" style="font-size:20px;text-align: center; color: #fff; background-color: #f8ac59;" value="" readonly></input></li>
+	</ul>
+
+	<div class="tab-content" style="width:100%;height:100%;">
+		<div style="float: left">
+			<input id="check" style="margin-bottom:5px;  font-size:20px;text-align: center; color: #fff; background-color: #f8ac59;" value="" readonly></input>
+		</div>
+		<input class="pl-btn" type="button" value="批量危险" onclick="plDanger();">
+		<input class="pl-btn" type="button" value="批量安全" onclick="plSafe();">
+		<table id="dyCheckTable" class="table table-striped table-bordered table-hover nomargin-bottom">
+			<thead>
+			<tr>
+				<!-- <th class="center"><input type="checkbox" id="allChecked">全选</th> -->
+				<th class="center" hidden>id</th>
+				<th class="center" style="width:10%">原始URL地址</th>
+				<th class="center">域名</th>
+				<th class="center" style="width:10%">跳转后url地址</th>
+				<th class="center">IP地址</th>
+				<th class="center">归属地</th>
+				<th class="center" style="width:10%">网址标题</th>
+				<th class="center" style="width:10%">网址内容</th>
+				<th class="center">发现时间</th>
+				<th class="center">仿冒类型</th>
+				<th class="center">仿冒对象</th>
+				<th class="center">操作</th>
+			</tr>
+			</thead>
+			<tbody id="tb">
+			@for(item in page){
+			<tr id="${item.id}" style="height:50px;">
+				<!-- <td class="center"><input type="checkbox" name="singleChecked"></td> -->
+				<td class="center" id="id" hidden>${item.id}</td>
+				<td class="center" id="url" title="${item.url}"><input value="${item.url}" hidden>
+					<a href="${item.url}" target="_blank">
+						${item.url}
+					</a>
+				</td>
+				<td class="center" id="host">${item.host}</td>
+				<td class="center" id="finalUrl" title="${item.finalUrl}"><input value="${item.finalUrl}" hidden>
+					<a href="${item.finalUrl}" target="_blank">
+						${item.finalUrl}
+					</a>
+				</td>
+				<td class="center" id="serverip">${item.serverip}</td>
+				<td class="center" id="city">${item.province}</td>
+				<td class="center" id="title" title="${item.title}">${item.title}</td>
+				<td class="center" id="content" title="${item.content}">${item.content}</td>
+				<td class="center" id="foundTime">${item.foundTime}</td>
+				<td class="center" id="type">${item.type}</td>
+				<td class="center" id="fakeObject">${item.fakeObject}</td>
+				<td class="center">
+					<input class="btn-link" type="button" onclick="safeClick(${item.id})" id="safe" value="安全">
+					<input class="btn-link" type="button" onclick="dangerClick(${item.id})" id="danger" value="危险">
+				</td>
+			</tr>
+			@}
+			</tbody>
+		</table>
+	</div>
+</div>
+<style>
+	table {
+		table-layout: fixed;
+		width: 100%;
+	}
+
+	td {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.pl-btn {
+		float: right;
+		margin-right: 10px;
+		margin-bottom: 10px;
+		width: 5%; /* 宽度 */
+		height: 35px; /* 高度 */
+		border-width: 0px; /* 边框宽度 */
+		border-radius: 3px; /* 边框半径 */
+		background: #1E90FF; /* 背景颜色 */
+		cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
+		outline: none; /* 不显示轮廓线 */
+		font-family: Microsoft YaHei; /* 设置字体 */
+		color: white; /* 字体颜色 */
+		font-size: 15px; /* 字体大小 */
+	}
+	#tb a {
+		display:block; /* 把行内元素 变成 块级元素 */
+	}
+</style>
+<script>
+	$(function(){
+		$("#sx").show();
+		$("#tj").hide();
+	});
+
+	$(function(){
+		getCount();
+		getUnCount();
+	})
+	
+	function removeTr(id){
+		$("#"+id).remove();	
+	}
+	
+	function getCount(){
+		$.ajax({
+			url:"${ctxPath}/dyCheck/getCount",
+			data:"",
+			dataType:"json",
+			type:"post",
+			async:false,
+			success:function(data){
+				$("#check").val("今日已审核数量："+data);
+
+			},
+			error :function(){
+				alert("数据异常，请联系管理员！");
+			}
+		})
+	}
+
+	function getUnCount(){
+		$.ajax({
+			url:"${ctxPath}/dyCheck/getUnCount",
+			data:"",
+			dataType:"json",
+			type:"post",
+			async:false,
+			success:function(data){
+				$("#unCheck").val("当前剩余条数："+data);
+
+			},
+			error :function(){
+				alert("数据异常，请联系管理员！");
+			}
+		})
+	}
+
+
+	
+	//单击安全
+	function safeClick(id){
+		$.ajax({
+			url:"${ctxPath}/dyCheck/getSafe",
+			data:{"id":id},
+			dataType:"text",
+			type:"post",
+			async:false,
+			success:function(data){
+				if(data=="success"){
+					removeTr(id);
+					getCount();
+                    getUnCount();
+				}
+			},
+			error : function(){
+				alert("数据异常，请联系管理员！");
+			}
+		})	 
+	}
+	
+	//单击危险
+	function dangerClick(id){
+		window.open("${ctxPath}/dyCheck/jump?id=" + id, "newwindow",
+        "method='post',height=450, width=600,top=100, left=350, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no");
+		
+	}
+	
+	//批量安全
+	function plSafe(){
+		var idlist = "";
+		$("#tb tr",window.document).each(function(trIndex,trElement){
+			$(trElement.children).each(function(){
+				var id = $(this).attr("id");
+				if(id=="id"){
+					idlist+=","+$(this).text();
+					$(trElement).data("id", $(this).text());
+				}
+			})
+		})				
+		
+		
+		if(confirm("确定数据都是安全的吗？")){
+			$.ajax({
+				url:"${ctxPath}/dyCheck/plSafe",
+				data:{"idlist":idlist},
+				dataType:"text",
+				type:"post",
+				async:false,
+				success:function(data){
+					if(data=="success"){
+						getCount();
+                        getUnCount();
+						//清空table所有tr
+						$("#tb", window.document).empty();
+					}
+				},
+				error : function(){
+					alert("数据异常，请联系管理员！");
+				}
+			})
+		}
+	}
+	
+	//批量危险
+	function plDanger(){
+		window.open("${ctxPath}/dyCheck/pljump?", "newwindow",
+        "method='post',height=650, width=1200,top=50, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no");
+	}
+			
+			
+</script>

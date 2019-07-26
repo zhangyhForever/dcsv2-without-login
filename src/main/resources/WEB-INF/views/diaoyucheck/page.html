@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+  <head>
+    <title>危险</title>
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="${ctxPath}/static/app/dy/css.css" />
+	<script src="${ctxPath}/static/app/dy/jquery-1.11.3.min.js"></script>
+	<script src="${ctxPath}/static/app/dy/all.js"></script>
+  </head>
+  <body>
+<div class="back-1"></div>
+<div class="back-2"></div>
+<div class="back-3 back-3_1"></div>
+<div class="back-4"></div>
+<div style="text-align:center;font-size:30px;color:#FFFFFF;margin-top:20px">钓鱼网站提交审核</div>
+<br>
+<div style="text-align:center;width:600px;">
+    <div style="display:inline;width:100px;margin-right:13px;font-weight:800;color:#FFFFFF">初始URL</div>
+    <div style="display:inline;margin-right:10px;">
+        <input type="text" id="url" style="width:300px;height:30px;margin-right:10px;font-size:16px;" />
+    </div>
+</div>
+<br>
+<div style="text-align:center;width:600px;">
+    <div style="display:inline;width:100px;margin-right:13px;font-weight:800;color:#FFFFFF">跳转URL</div>
+    <div style="display:inline;margin-right:10px;">
+        <input type="text" id="finalurl" style="width:300px;height:30px;margin-right:10px;font-size:16px;" />
+    </div>
+</div>
+<br>
+<div style="text-align:center;width:600px;">
+    <div style="display:inline;width:100px;margin-right:50px;font-weight:800;color:#FFFFFF">IP</div>
+    <div style="display:inline;margin-right:10px;">
+        <input type="text" id="ip" style="width:300px;height:30px;margin-right:10px;font-size:16px;" />
+    </div>
+</div>
+<br>
+<div style="text-align:center;width:600px;">
+    <div style="display:inline;width:100px;margin-right:35px;font-weight:800;color:#FFFFFF">类型</div>
+    <div style="display:inline;margin-right:10px;">
+        <input type="text" id="type" style="width:300px;height:30px;margin-right:10px;font-size:16px;" />
+    </div>
+</div>
+<br>
+<div style="text-align:center;width:600px;">
+    <div style="display:inline;width:100px;margin-right:5px;font-weight:800;color:#FFFFFF">仿冒对象</div>
+    <div style="display:inline;margin-right:10px;">
+        <input type="text" id="fake_object" style="width:300px;height:30px;margin-right:10px;font-size:16px;" />
+    </div>
+</div>
+<br>
+<div style="position:absolute;bottom:45px">   <a href="#" class="a a1" onclick="submit()" style=";margin-left:180px;margin-top:50px">提<i></i>交</a>
+    <a href="#" class="a a1" onclick="cancel()">取<i></i>消</a>
+</div>
+ <script type="text/javascript" charset="UTF-8">
+ /*危险回显  */
+var id = ${id};
+var url;
+var ip;
+var final_url;
+var type;
+var fake_object;
+window.onload = function () {
+   /*  id = location.search.substring(1); */
+    $.ajax({
+    	url: '${ctxPath}/dyCheck/geturlforid',
+    	contentType: "application/x-www-form-urlencoded; charset=utf-8",
+    	data : {"id":id},
+        type: "post",
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+        	// alert(data[0].url); 
+            url = data[0].url;
+            ip = data[0].serverip;
+            if (ip == null||ip == "") {
+                ip = "空";
+            }
+            final_url = data[0].finalUrl;
+            if (final_url == null||final_url == "") {
+                final_url = "空";
+            }
+            type = data[0].type;
+ 
+            if (type == null||type == "") {
+                type = "空";
+            }
+            fake_object = data[0].fakeObject;
+            if (type == "博彩" || type =="") {
+                document.getElementById("fake_object").value = "博彩";
+                fake_object = "博彩";
+            }
+            if (fake_object == null||fake_object == "") {
+                fake_object = "空";
+            }
+            document.getElementById("url").value = url;
+            document.getElementById("ip").value = ip;
+            document.getElementById("type").value = type;
+            document.getElementById("fake_object").value = fake_object;
+            document.getElementById("finalurl").value = final_url; 
+        }
+    }); 
+};
+
+/*危险提交  */
+function submit() {
+	
+	var urll = document.getElementById("url").value;
+	var finalurl = document.getElementById("finalurl").value;
+	var ipp = document.getElementById("ip").value;
+	var typee = document.getElementById("type").value;
+	var fakeObject = document.getElementById("fake_object").value;
+	
+	//alert(urll);
+	//alert(finalurl);
+	//alert(ipp);
+	//alert(typee);
+	//alert(fakeObject);
+	
+    $.ajax({
+    	url: '${ctxPath}/dyCheck/getDanger',
+    	data : {"id":id,"urll":urll,"finalurl":finalurl,"ipp":ipp,"typee":typee,"fakeObject":fakeObject},
+        type: "post",
+        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+        dataType: 'text',
+        async: false,
+        success: function (data) { 
+            if (data == "success") {
+            	window.opener.getCount();
+            	window.opener.getUnCount();
+                //window.opener.removeTr(id.indexOf("=")+1); //调用父窗口方法，移除该行数据
+            	window.opener.removeTr(id);
+                window.close();  
+            } else {
+                alert("提交数据异常");
+            }
+        }
+    });
+};
+ 
+function cancel() {
+    window.close();
+};
+</script>
+</body>
+</html>

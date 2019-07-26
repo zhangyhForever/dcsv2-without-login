@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<head>
+    <title>危险</title>
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="${ctxPath}/static/app/dy/css.css"/>
+    <script src="${ctxPath}/static/app/dy/jquery-1.11.3.min.js"></script>
+    <script src="${ctxPath}/static/app/dy/all.js"></script>
+</head>
+<body>
+<div class="back-1"></div>
+<div class="back-2"></div>
+<div class="back-3 back-3_1"></div>
+<div class="back-4"></div>
+<div style="text-align:center;font-size:30px;color:#FFFFFF;margin-top:20px">钓鱼网站批量提交审核</div>
+<br>
+<table style="width:100%;table-layout:fixed;margin-top:0px;overflow:hidden;text-overflow:ellipsis;" id="dd">
+    <thead>
+    <tr>
+        <th>初始URL</th>
+        <th>跳转URL</th>
+        <th>IP</th>
+        <th>类型</th>
+        <th>仿冒对象</th>
+    </tr>
+    </thead>
+    <tbody id="tb"></tbody>
+</table>
+<div style="position:absolute;bottom:45px">
+    <a href="#" class="a a1" onclick="submit()" style=";margin-left:450px;margin-top:50px">提<i></i>交</a>
+    <a href="#" class="a a1" onclick="cancel()" style=";margin-left:20px">取<i></i>消</a>
+</div>
+<style>
+#dd tr th{
+    font-size: 18px;
+    color: #c0c0c0;
+}
+
+</style>
+<script type="text/javascript" charset="UTF-8">
+    /*批量危险回显  */
+    var ids = "";
+    window.onload = function () {
+        //遍历父窗口表格tbody的tr
+        $("#tb tr", window.opener.document).each(function (trIndex, trElement) {
+            var tr = $("<tr></tr>");
+            //遍历父窗口每一行的td
+            $(trElement.children).each(function () {
+                var id = $(this).attr("id");
+                console.log(id);
+                if (id == "id") {
+                    ids += $(this).text()+",";
+                    tr.append("<td hidden><input id='id' value='"+$(this).text()+"'></td>");
+                }
+                if (id == "finalUrl") {
+                    tr.append("<td><input id='finalUrl' type='text' style='border:0px;width:200px;height:30px;margin-left:10px;margin-right:10px;font-size:16px;' value='" + $(this).children("input").val() + "'readonly></td>");
+                }
+                if (id == "serverip") {
+                    tr.append("<td><input id='serverip' type='text' style='border:0px;width:200px;height:30px;margin-left:10px;margin-right:10px;font-size:16px;' value='" + $(this).text() + "'readonly></td>");
+                }
+                if (id == "url") {
+                    tr.append("<td><input id='url' type='text' style='border:0px;width:200px;height:30px;margin-left:10px;margin-right:10px;font-size:16px;' value='" + $(this).children("input").val() + "'readonly></td>");
+                }
+                if (id == "type") {
+                    tr.append("<td><input id='type' type='text' style='width:200px;height:30px;margin-left:10px;margin-right:10px;font-size:16px;' value='" + $(this).text() + "'></td>");
+                }
+                if (id == "fakeObject") {
+                    if ($(this).prev().text() == "博彩") {
+                        $(this).text("博彩");
+                    }
+                    tr.append("<td><input id='fakeObject' type='text' style='width:200px;height:30px;margin-left:10px;margin-right:10px;font-size:16px;' value='" + $(this).text() + "'></td>");
+                }
+                $("#tb").append(tr);
+            });
+        });
+    };
+
+    /*批量危险提交  */
+    function submit() {
+        var tableId = document.getElementById("dd");
+        var datas = [];
+        $.each($("#tb tr"), function (index, value) {
+            var map = new Map();
+            var data = {};
+            var tr = $(this);
+            var tds = tr.children("td");
+            for (var i = 0; i < tds.length; i++) {
+                var input = $(tds[i]).children("input");
+                var id = input.attr("id");
+                map.set(id, input.val());
+            }
+            map.forEach(function(item, key){
+                if (key == "id") {
+                    data.id = item;
+                }
+                if (key == "finalUrl") {
+                    data.finalurl = item;
+                }
+                if (key == "serverip") {
+                    data.serverip = item;
+                }
+                if (key == "url") {
+                    data.url = item;
+                }
+                if (key == "type") {
+                    data.type = item;
+                }
+                if (key == "fakeObject") {
+                    data.fakeObject = item;
+                }
+            })
+            datas.push(data);
+        })
+        var dataArr = JSON.stringify(datas);
+        console.log(ids);
+        for (var i = 1; i < tableId.rows.length; i++) {
+            var taget2 = tableId.rows[i].cells[2].getElementsByTagName("INPUT")[0].value;
+            var taget3 = tableId.rows[i].cells[3].getElementsByTagName("INPUT")[0].value;
+            var taget4 = tableId.rows[i].cells[4].getElementsByTagName("INPUT")[0].value;
+            if (taget2 == "") {
+                alert("URL不能为空");
+                return;
+            }
+            if (taget3 == "") {
+                alert("类型不能为空");
+                return;
+            }
+            if (taget4 == "") {
+                alert("仿冒对象不能为空");
+                return;
+            }
+
+        }
+        //alert(typeof(arrid));
+        $.ajax({
+            url: '${ctxPath}/dyCheck/plDanger',
+            type: "post",
+            data: {
+                "dataArr": dataArr,
+                "ids": ids
+            },
+            async: false,
+            //traditional: true,
+            success: function (data) {
+                if (data == "success") {
+                    window.opener.getCount();
+                    window.opener.getUnCount();
+                    //alert("批量操作成功");
+                    $("#tb", window.opener.document).empty();
+                    //$("#next", window.opener.document).css("visibility","visible");
+                      window.close();
+                } else {
+                    alert("提交数据异常");
+                }
+            }
+        });
+
+    };
+
+    function cancel() {
+        window.close();
+    };
+</script>
+</body>
+</html>

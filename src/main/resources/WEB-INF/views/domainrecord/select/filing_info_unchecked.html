@@ -1,0 +1,68 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#home"> <i
+				class="green ace-icon fa fa-users bigger-120"></i>数据查询 </a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div id="home" class="tab-pane active clearfix">
+			<#search>
+			<form action="${ctxPath}/Select/unchecked/list" method="post"
+				id="search-form" target="list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+
+					<div class="col-sm-7">
+						<label class="inline" style="font-size:14.5px;">查询字段：</label> <select
+							id="example-radio" class="inline width-20" name="param">
+							<option value="0" selected="selected">-请选择-</option>
+							<option value="mastercode">主备案号</option>
+							<option value="reviewdate">审核通过时间</option>
+							<option value="sponsor">主办单位名称</option>
+							<option value="nature">主办单位性质</option>
+							<option value="name">网站名称</option>
+							<option value="page">网站首页</option>
+							<option value="chargeperson">负责人</option>
+							<option value="domain">网站域名</option>
+							<option value="code">备案号</option>
+							<option value="reponseCode">响应码</option>
+						</select> <label class="inline" style="font-size:14.5px;">查询信息：</label> <input
+							class="inline width-50" type="text" id="input_1" name="input_1"
+							placeholder="请输入具体选择信息" />
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="search-btn"
+							style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;"
+							value="条件查询" readonly />
+						 <a href="javascript:sub();" class="width-45"
+							style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;">
+							<input type="text" value="导出数据" class="width-45"
+							style="cursor: pointer; text-align: center; color: #fff; background-color: #f8ac59;">
+						</a>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="space-6"></div>
+			<div id="list-page"></div>
+		</div>
+
+	</div>
+</div>
+<style>
+#profile .center>label {
+	width: 100px;
+	text-align: right;
+}
+</style>
+<script>
+	$("#search-form").getPageList({
+		'submitBtnId' : 'search-btn'
+	 });
+	function sub(){ 
+	        var $option = $("#example-radio  option:selected").val();
+		    var $input_1 = $("#input_1").val();
+			window.location.href="${ctxPath}/Select/unchecked/csvSaveAll?param=" + $option
+							+ "&input_1=" + $input_1;     
+	}
+	
+</script>

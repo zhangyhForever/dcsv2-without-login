@@ -1,0 +1,156 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#domestic"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 国内态势
+		</a></li>
+		
+		<li class=""><a data-toggle="tab" href="#abroad" id="aabroad"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 国外态势
+		</a></li>
+	</ul>
+	
+	<div class="tab-content">
+		<div id="domestic" class="tab-pane active clearfix">
+			<#search>
+			<form action="${ctxPath}/SWOTAnalysis/domesticMenu" method="post" id="search-form-domestic"
+				target="list-page1" class="center clearfix">
+				<div class="row padding-tb-10">
+				    <div class="col-sm-6">
+						<label class="inline">开始日期：</label> <input type="text"
+							class="width-45" name="domesticstartdate" id="domesticstartdate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="" readonly />
+					</div>
+					<div class="col-sm-6" style="margin-left:-2%">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="domesticenddate" id="domesticenddate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="search-btn-domestic" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:-12%;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="export-btn-demostic" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:10%;" value="数据导出" readonly/> 
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div id="list-page1"></div>
+		</div>
+		
+		<div id="abroad" class="tab-pane clearfix">
+			<#search>
+			<form action="${ctxPath}/SWOTAnalysis/abroadMenu" method="post" id="search-form-abroad"
+				target="list-page2" class="center clearfix">
+				<div class="row padding-tb-10">
+				    <div class="col-sm-6">
+						<label class="inline">开始日期：</label> <input type="text"
+							class="width-45" name="abroadstartdate" id="abroadstartdate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="" readonly />
+					</div>
+					<div class="col-sm-6" style="margin-left:-2%">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="abroadenddate" id="abroadenddate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="search-btn-abroad" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:-12%;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="export-btn-abroad" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:10%;" value="数据导出" readonly/> 
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div id="list-page2"></div>
+		</div>		
+		
+	</div>
+ </div>
+<style>
+#home input{background:#18202d;color:#fff;}
+#home select{background:#18202d;color:#fff;}
+</style>
+<script>
+
+		var date = new Date(); 
+		var year = date.getFullYear(); 
+		var month =(date.getMonth() + 1).toString(); 
+		var day = (date.getDate()).toString();  
+		if (month.length == 1) { 
+		    month = "0" + month; 
+		} 
+		if (day.length == 1) { 
+		    day = "0" + day; 
+		}
+		var sdateTime = getSdate(date);
+		var edateTime = year + "-" + month + "-" + day;
+
+		//domestic
+		$("#domesticstartdate").val(sdateTime);
+		$("#domesticenddate").val(edateTime);
+		//abroad
+		$("#abroadstartdate").val(sdateTime);
+		$("#abroadenddate").val(edateTime);
+		
+
+		$("#search-form-domestic").getPageList({
+			'submitBtnId' : 'search-btn-domestic'
+		});
+
+		$("#aabroad").click(function(){
+			$("#search-form-abroad").getPageList({
+				'submitBtnId' : 'search-btn-abroad'
+			});
+		})
+		
+		$(function(){
+			$("#sx").show();
+			$("#tj").show();
+		})
+		
+		//获得一个月前的日期
+	    function getSdate(date){
+		
+		var year = date.getFullYear(); 
+		var month =(date.getMonth()).toString(); 
+		var day = (date.getDate()).toString();  
+		if (month.length == 1) { 
+		    month = "0" + month; 
+		} 
+		if (day.length == 1) { 
+		    day = "0" + day; 
+		}
+		
+		var time = year + "-" + month + "-" + day;
+		//alert(time);
+		return time;
+	}
+		
+		//中国省市数据导出
+		$("#export-btn-demostic").click(function(){
+			$("#demostictable").table2excel({
+				exclude: ".noExl",
+	            filename: "中国地图数据分析"+(new Date()).getTime(),
+	            exclude_img: true,
+	            exclude_links: true,
+	            exclude_inputs: true
+			});
+		})
+		
+		//国家级别数据导出
+		$("#export-btn-abroad").click(function(){
+			$("#abroadtable").table2excel({
+				exclude: ".noExl",
+	            filename: "世界地图数据分析"+(new Date()).getTime(),
+	            exclude_img: true,
+	            exclude_links: true,
+	            exclude_inputs: true
+			});
+		})
+		
+		
+		
+		
+</script>
+
+
+
+
+ 
+ 

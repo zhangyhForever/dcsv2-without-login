@@ -1,0 +1,964 @@
+<div class="container index_all">
+	<div class="row" style="margin-top: 3%;">
+
+		<div class="col-sm-3 col-md-3 col-lg-3">
+			<!--<div id="level" class="kuang_list" style="height: 10vh;">
+				<h3>威胁评级</h3>
+				<h2 style="margin-left: 25%; margin-top: 1%; color: #fff;">当前等级：98</h2>
+				</div>-->
+			<div id="buliangTrend" class="kuang_list" style="height: 35vh">
+				<h3>一周图文违规数量变化趋势</h3>
+				<div id="buliangWeek" style="width: 100%; height: 90%;"></div>
+				</div>
+
+			<div id="state" class="kuang_list" style="height: 35vh">
+				<h3>一周恶意事件数量变化趋势</h3>
+				<div id="maliceState" style="width: 100%; height: 90%;"></div>
+			</div>
+
+			<!--<div id="diaoyuTrend" class="kuang_list" style="height: 26vh">
+				<h3>一周钓鱼违规数量变化趋势</h3>
+				<div id="diaoyuWeek" style="width: 100%; height: 90%;"></div>
+			</div>
+			<div id="buliangIpTop" class="kuang_list" style="height: 23vh">
+				<h3>当日不良图文ip-top5</h3>
+				<div id="imageTop" style="width: 100%; height: 90%;"></div>
+			</div>-->
+
+		</div>
+
+		<div class="col-sm-6 col-md-6 col-lg-6">
+			<div id="leftOfMap" style="position:absolute;left:0;top:0;z-index:5;">
+				<h5 id="dayDetectionCount" class="iconlist"></h5>
+				<h5 id="dayTotal" class="iconlist"></h5>
+				<h5 id="dayProcess" class="iconlist"></h5>
+				<h5 id="illegalCount" class="iconlist"></h5>
+			</div>
+
+			<!--原地图位置-->
+			<!--<div id="myChart" style="height: 63vh;width: 100%;margin-top: 1vh;margin-bottom:1vh;">-->
+			<!--地图-->
+			<div id="myChart" style="height: 75vh;width: 100%;margin-top: 1vh;margin-bottom:1vh;"></div>
+			<!--<div id="rightOfMap" style="position:absolute;right:0;top:0;z-index:5;">-->
+				<!--<h5 id="dayIllegalImage" class="iconlist"></h5>-->
+				<!--<h5 id="dayIllegalText" class="iconlist"></h5>-->
+				<!--<h5 id="dayIllegalDiaoyu" class="iconlist"></h5>-->
+			<!--</div>-->
+			<!--<div>-->
+				<!--<div id="buliangDomainTop" class="kuang_list" style="height: 23vh;width:48%;float:left;margin-right:3%">-->
+					<!--<h3>当日不良图文域名-top5</h3>-->
+					<!--<table>-->
+						<!--<thead>-->
+							<!--<tr>-->
+								<!--<th>域名</td>-->
+								<!--<th>出现次数</th>-->
+								<!--<th>厂家</th>-->
+							<!--</tr>-->
+						<!--</thead>-->
+						<!--<tbody id="imgDomain">-->
+						<!--</tbody>-->
+					<!--</table>-->
+				<!--</div>-->
+				<!--<div id="diaoyuDomainTop" class="kuang_list" style="height: 23vh;width:48%;float:left;">-->
+					<!--<h3>当日钓鱼网站域名-top5</h3>-->
+					<!--<table>-->
+						<!--<thead>-->
+							<!--<tr>-->
+								<!--<th>域名</td>-->
+								<!--<th>出现次数</th>-->
+								<!--<th>厂家</th>-->
+							<!--</tr>-->
+						<!--</thead>-->
+						<!--<tbody id="textDomain">-->
+						<!--</tbody>-->
+					<!--</table>-->
+				<!--</div>-->
+			<!--</div>-->
+		</div>
+
+		<div class="col-sm-3 col-md-3 col-lg-3">
+
+			<div id="Region" class="kuang_list" style="height: 35vh;">
+				<h3>恶意事件地区分布(近一周)</h3>
+				<div id="maliceRegion" style="width: 100%; height:100%"></div>
+			</div>
+
+			<!--<div id="diaoyuCountry" class="kuang_list" style="height: 35vh;">-->
+				<!--<h3>钓鱼网站来源国家分布</h3>-->
+				<!--<div id="country" style="width: 100%; height:100%"></div>-->
+			<!--</div>-->
+			<div id="typeProportion" class="kuang_list" style="height: 35vh;">
+				<h3>当日违规占比</h3>
+				<div id="proportion" style="width: 100%; height: 90%;"></div>
+			</div>
+			<!--<div id="diaoyuIpTop" class="kuang_list" style="height: 23vh;">-->
+				<!--<h3>当日钓鱼网站ip-top5</h3>-->
+				<!--<div id="textTop" style="width: 100%; height: 90%;"></div>-->
+			<!--</div>-->
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$("#fx").hide();
+	$("#sx").hide();
+	$("#tj").hide();
+	showLevel(false);
+	showProcess(true);
+	showBuliangTrend(true);
+	showDiaoyuTrend(false);
+	showBuliangDomainTop(false);
+	showDiaoyuDomainTop(false);
+	showBuliangIpTop(false);
+	showDiaoyuIpTop(false);
+	showDiaoyuCountry(false);
+	showTypeProportion(true);
+	showMap(true);
+	showMaliceState(true);
+	showMaliceRegion(true);
+
+	//恶意事件一周违规情况
+	function showMaliceState(isShow){
+		if(!isShow){
+			$("#maliceState").hide();
+			return;
+		}
+		$.ajax({
+			url : 'overview/maliceState',
+			type: 'POST',
+			contentType : "application/json",
+			success: function(data) {
+				var foundTime = [];
+				var stateCount = [];
+				$.each(JSON.parse(data),function(index, value){
+					foundTime.push(new Date(value.foundtime).format("MM-dd"));
+					stateCount.push(value.statecount);
+				});
+				var stateChart = echarts.init(document.getElementById('maliceState'));
+				option = {
+					color: ['#00FFFF'],
+					animation : true,
+					tooltip : {
+						trigger : 'axis',
+						formatter: "{b}:<br/> {c}(条)"
+					},
+					grid : {
+						x : '12%',
+						y : '15%',
+						x2 : '8%',
+						y2 : '30%'
+					},
+					xAxis: {
+						type : 'category',
+						data : foundTime,
+						axisLabel: {
+							interval : 0,
+							rotate : -30,
+							textStyle : {
+								color : '#fff',
+								fontSize : 10
+							}
+						}
+					},
+					yAxis: {
+						type: 'value',
+						axisLabel : {
+							textStyle : {
+								color : '#fff',
+								fontSize : 10
+							}
+						}
+					},
+					series : [{
+						data: stateCount,
+						type: 'line'
+					}]
+				};
+				stateChart.setOption(option);
+			},
+			error: function(){
+				alert("恶意事件态势数据请求错误！");
+			}
+		});
+	}
+	//恶意事件区域分布
+	function showMaliceRegion(isShow){
+		if(!isShow){
+			$("#maliceRegion").hide();
+			return;
+		}
+		$.ajax({
+			url : 'overview/maliceRegion',
+			type: 'POST',
+			contentType : "application/json",
+			success: function(data){
+				var regionProportion = [];
+				$.each(JSON.parse(data), function(index, value){
+					regionProportion.push({
+						name: value.city, value: value.regionalcount
+					});
+				});
+				var regionChart = echarts.init(document.getElementById('maliceRegion'));
+				var option = {
+					title : {
+						show: false,
+						text: '恶意事件地区分布统计图(最近一周)',
+						textStyle: {
+							fontWeight: '100',
+							fontSize: 16,
+							color: '#00FFFF'
+						}
+					},
+					color: ['#05d58d', '#23b7ff', '#FFFF00', '#FF8C00', '#FF0000', '#FE8463'],
+					tooltip : {
+						trigger: 'axis'
+					},
+					toolbox: {
+						show : true,
+						feature : {
+							magicType : {show: false, type: ['pie', 'bar']},
+							saveAsImage : {show: false}
+						}
+					},
+					calculable : true,
+					series : [
+						{
+							name:'恶意事件（数量）',
+							type:'pie',
+							center: ['50%', '50%'],
+							radius: ['0', '50%'],
+							data:regionProportion
+						}
+					]
+				};
+				regionChart.setOption(option);
+			},
+			error: function(){
+				alert("恶意事件地区分布数据请求错误！");
+			}
+		})
+	}
+
+	//等级
+	function showLevel(isShow) {
+		if(!isShow){
+			$("#level").hide();
+			return;
+		}
+	}
+	//处理量统计
+	function showProcess(isShow){
+		if(!isShow){
+			$("#leftOfMap").hide();
+			$("#rightOfMap").hide();
+			return;
+		}
+		$.ajax({
+			type: 'post',
+			async : false,
+			contentType : "application/json",
+			url : "overview/getData",
+			dataType : "json",
+			error : function() {
+				alert("不好意思,统计数据获取失败!");
+			},
+			success: function(data){
+				$("#dayDetectionCount").text("总检测量："+data.dayDetectionCount);
+				$("#dayTotal").text("当日发现："+data.dayTotalCount);
+				$("#dayProcess").text("当日处理："+data.dayProcessCount);
+				$("#illegalCount").text("当日违规："+data.illegalCount);
+				$("#dayIllegalImage").text("违规图片："+data.illegalImage);
+				$("#dayIllegalText").text("违规文本："+data.illegalText);
+				$("#dayIllegalDiaoyu").text("钓鱼网站："+data.illegalDiaoyu);
+			}
+		})
+	}
+	//中间地图
+	function showMap(isShow){
+		if(!isShow){
+			$("#myChart").hide();
+			return;
+		}
+		$.ajax({
+			type : "post",
+			async : false,
+			contentType : "application/json",
+			url : "overview/getData",
+			/* url : "overview/getCurrentCount", */
+			dataType : "json",
+			error : function() {
+				alert("不好意思,图表请求数据失败啦!");
+			},
+			success : function(json) {
+				var jsonUrl = "./static/app/json/hunan.json";
+				var province = "湖南省";
+				var city = "长沙";
+				var mapName = "hunan";
+				var geoCoorMap = {
+					"长沙":[112.982279,28.19409,city,json.illegalCount]
+				};
+				var convertData = function(data) {
+					var res = [];
+					for (a in data) {
+						res.push({
+							name:a,value:data[a]
+						});
+					}
+					return res;
+				};
+				$.getJSON(jsonUrl,function(geoJson){
+					echarts.registerMap(mapName, geoJson);
+					var myChart = echarts.init(document.getElementById('myChart'));
+					var option = {
+						title : {
+							text : province+"违规信息分布情况",
+							x : 'center',
+							textStyle: {
+								fontWeight: '100',
+								fontSize: 18,
+								color: '#00FFFF'
+							}
+						},
+						tooltip : {  //鼠标悬浮时显示内容
+							trigger : 'item',
+							formatter: function(){
+								return province+"违规:"+json.illegalCount;
+							}
+						},
+						geo : {
+							show: true,
+							map: mapName,
+							label: {
+							    color: '#fff',
+                                normal: {
+                                    show: false
+                                },
+                                emphasis: {
+                                    show: true
+                                }
+                            },
+							roam: false,
+							itemStyle: { //地图颜色
+								normal: {
+									areaColor: '#098a9f',
+									borderColor: '#9be4ff',
+									borderWidth: 2
+								},
+								emphasis: {
+									areaColor: '#43b9f6'
+								}
+							}
+						},
+						series : [
+							{
+								type: 'effectScatter',
+								coordinateSystem: 'geo',
+								data: convertData(geoCoorMap)  ,
+								symbol: 'path://M512 39.384615l169.353846 295.384615 342.646154 63.015385-240.246154 248.123077L827.076923 984.615385l-315.076923-145.723077L196.923077 984.615385l43.323077-334.769231L0 401.723077l342.646154-63.015385L512 39.384615',
+								symbolSize: 8,
+								rippleEffect: {
+									period: 5, //波纹秒数
+									brushType: 'fill', //stroke(涟漪)和fill(扩散)，两种效果
+									scale: 6 //波纹范围
+								},
+								label: {
+									normal: {
+										formatter: '{b}',
+										position: 'right',
+										offset: [10,0],
+										fontSize: 18,
+										show: true
+									},
+									emphasis: {
+										show: false
+									}
+								},
+								itemStyle: {    //打点的颜色
+									normal: {
+										color: '#ff0000',
+										shadowBlur: 100,
+										shadowColor: '#0d5ebd'
+									}
+								},
+								zlevel: 1
+							}
+						]
+					};
+					myChart.setOption(option);
+				})
+			}
+		})
+	}
+	//一周不良违规数量趋势
+	function showBuliangTrend(isShow){
+		if(!isShow){
+			$("#buliangTrend").hide();
+			return;
+		}
+		$.ajax({
+			type : "post",
+			async : false,
+			contentType : "application/json",
+			url : "overview/weekCount/buliang",
+			dataType : "json",
+			error : function() {
+				alert("不好意思,一周违规图文数据请求失败!");
+			},
+			success : function(json) {
+				var date = new Array(7);
+				var totalCount = [0,0,0,0,0,0,0];
+				var imageCount = [0,0,0,0,0,0,0];
+				var textCount = [0,0,0,0,0,0,0];
+				for(var i=6,j=0; i>=0; i--,j++){
+					date[j] = getDateStr(i, false);
+				}
+				$.each(json, function(n, value){
+					for(var i=0; i<date.length; i++){
+						if(date[i] == value.processDate){
+							totalCount.splice(i, 1, value.illegalCount);
+							imageCount.splice(i, 1, value.illegalImage);
+							textCount.splice(i, 1, value.illegalText);
+							break;
+						}
+					}
+				});
+				var myChart = echarts.init(document.getElementById('buliangWeek'));
+				var option = {
+					color: ['#00FFFF'],
+					animation : true,
+					tooltip : {
+						trigger : 'axis',
+						formatter: "{b}:<br/>{c}(条)"
+					},
+					title : {
+						top : 20,
+						show : false
+					},
+					grid : {
+						x : '12%',
+						y : '15%',
+						x2 : '8%',
+						y2 : '30%'
+					},
+					xAxis: {
+						type : 'category',
+						data : date,
+						axisLabel: {
+							interval : 0,
+							rotate : -30,
+							textStyle : {
+								color : '#fff',
+								fontSize : 10
+							}
+						}
+					},
+					yAxis: {
+						type: 'value',
+						axisLabel: {
+							textStyle : {
+								color : '#fff',
+								fontSize : 10
+							}
+						}
+					},
+					series : [{
+						data: totalCount,
+						type: 'line'
+					}]
+				};
+				myChart.setOption(option);
+			}
+		});
+	}
+	//一周钓鱼违规数量变化趋势
+	function showDiaoyuTrend(isShow){
+		if(!isShow){
+			$("#diaoyuTrend").hide();
+			return;
+		}
+		$.ajax({
+			type : "post",
+			async : false,
+			contentType : "application/json",
+			url : "overview/weekCount/diaoyu",
+			dataType : "json",
+			error : function() {
+				alert("不好意思,一周钓鱼违规趋势请求失败!");
+			},
+			success : function(json) {
+				var date = new Array(7);
+				var count = [0,0,0,0,0,0,0];
+				for(var i=6,j=0; i>=0; i--,j++){
+					date[j] = getDateStr(i, false);
+				}
+				$.each(json, function(n, value){
+					for(var i=0; i<date.length; i++){
+						if(date[i] == value.processDate){
+							count.splice(i, 1, value.illegalDiaoyu);
+							break;
+						}
+					}
+				});
+				var myChart = echarts.init(document.getElementById('diaoyuWeek'));
+				var option = {
+					color: ['#00FFFF'],
+					animation : true,
+					tooltip : {
+						trigger : 'axis',
+						formatter: "{b}:<br/> {c}(条)"
+					},
+					grid : {
+						x : '12%',
+						y : '15%',
+						x2 : '8%',
+						y2 : '30%'
+					},
+					xAxis: {
+						type : 'category',
+						data : date,
+						axisLabel: {
+							interval : 0,
+							rotate : -30,
+							textStyle : {
+								color : '#fff',
+								fontSize : 10
+							}
+						}
+					},
+					yAxis: {
+						type: 'value',
+						axisLabel : {
+							textStyle : {
+								color : '#fff',
+								fontSize : 10
+							}
+						}
+					},
+					series : [{
+						data: count,
+						type: 'line'
+					}]
+				};
+				myChart.setOption(option);
+			},
+		});
+	}
+	//当日不良图文Domain-top5
+	function showBuliangDomainTop(isShow){
+		if(!isShow){
+			$("#buliangDomainTop").hide();
+			return;
+		}
+		$.ajax({
+			type : 'post',
+			url : 'overview/getDomainTopn/buliang',
+			contentType : "application/json",
+			dataType : "json",
+			error : function(){
+				alert("不良图文Domain数据请求错误！");
+			},
+			success : function(data){
+				var tbody = $("#imgDomain");
+				tbody.empty();
+				for(var index in data){
+					if(typeof data[index] == "function"){
+						continue;
+					}
+					var tr = $("<tr></tr>");
+					tr.append("<td title="+data[index].resourceDomain+">"+data[index].resourceDomain+"</td>");
+					tr.append("<td>"+data[index].domainCount+"</td>");
+					tr.append("<td title="+data[index].domainFirm+">"+data[index].domainFirm+"</td>");
+					tbody.append(tr);
+				}
+			}
+		})
+	}
+
+	//图文钓鱼占比
+	function showTypeProportion(isShow){
+		if(!isShow){
+			$("#typeProportion").hide();
+			return;
+		}
+		$.ajax({
+			type : "post",
+			async : false,
+			contentType : "application/json",
+			url : "overview/getTypeCount",
+			dataType : "json",
+			error : function() {
+				alert("不好意思,违规占比请求数据失败!");
+			},
+			success : function(json) {
+				myChart = echarts.init(document.getElementById('proportion'));
+				option = {
+					animation : true,
+					color: ['#00FFFF', '#00FF00', '#FFFF00', '#FF8C00', '#FF0000', '#FE8463'],
+					tooltip : {
+						trigger : 'item',
+						formatter: "{a} <br/>{b} : {c} ({d}%)"
+					},
+					legend : {
+						x : 'left',
+						data: [
+							'图片',
+							'文本',
+							'恶意事件'
+						],
+						textStyle : {
+							color : '#fff'
+						}
+					},
+					toolbox: {
+						show : false,
+						feature : {
+							mark : {show: true},
+							dataView : {show: true, readOnly: false},
+							restore : {show: true},
+							saveAsImage : {show: true}
+
+						},
+						x:"right",
+						y:"bottom"
+					},
+					series : [
+						{
+							name: '内容类型',
+							type: 'pie',
+							radius : '60%',
+							center: ['50%', '50%'],
+							corsor: 'pointer',
+							data: [
+								{name:'图片', value:json.illegalImage},
+								{name:'文本', value:json.illegalText},
+								{name:'恶意事件', value:json.illegalDiaoyu}
+							],
+							itemStyle: {
+								emphasis: {
+									shadowBlur: 10,
+									shadowOffsetX: 0,
+									shadowColor: 'rgba(0, 0, 0, 0.5)'
+								}
+							}
+						}
+					]
+				};
+				myChart.setOption(option);
+			},
+		});
+	}
+	//钓鱼网站国家分布占比
+	function showDiaoyuCountry(isShow){
+		if(!isShow){
+			$("#diaoyuCountry").hide();
+			return;
+		}
+		$.ajax({
+			url: 'overview/getCountry',
+			type: 'post',
+			dataType: 'json',
+			error: function(){
+				alert("钓鱼网站国家分布信息获取失败！");
+			},
+			success: function(data){
+				var dataArr = [];
+				$.each(data, function(index, value){
+					dataArr.push(
+							{name:value.country,value:value.count}
+					);
+				})
+				var myChart = echarts.init(document.getElementById('country'));
+				option = {
+					color: ['#00FFFF', '#00FF00', '#FFFF00', '#FF8C00', '#FF0000', '#FE8463', '#FFFF00'],
+					tooltip : {
+						trigger: 'item',
+						formatter: "{a} <br/>{b} : {c} ({d}%)"
+					},
+					toolbox: {
+						show : false,
+						feature : {
+							mark : {show: true},
+							dataView : {show: true, readOnly: false},
+							magicType : {
+								show: true,
+								type: ['pie', 'funnel']
+							},
+							restore : {show: true},
+							saveAsImage : {show: true}
+						}
+					},
+					calculable : true,
+					series : [
+						{
+							name:'违规数量',
+							type:'pie',
+							radius : ['20%', '70%'],
+							center : ['50%', '50%'],
+							roseType : 'area',
+							label: {
+								normal: {
+									show: true
+								},
+								emphasis: {
+									show: true
+								}
+							},
+							lableLine: {
+								normal: {
+									show: true
+								},
+								emphasis: {
+									show: true
+								}
+							},
+							data: dataArr
+						}
+					]
+				};
+				myChart.setOption(option);
+			}
+		})
+	}
+	//当日不良图文ip top5
+	function showBuliangIpTop(isShow){
+		if(!isShow){
+			$("#buliangIpTop").hide();
+			return;
+		}
+		$.ajax({
+			type : 'post',
+			url : 'overview/getIpTopn/buliang',
+			contentType : "application/json",
+			dataType : "json",
+			error : function(){
+				alert("不良图文ip数据请求错误！");
+			},
+			success : function(data){
+				var ips = new Array();
+				var ipCount = new Array();
+				for(var index=0; index<data.length; index++){
+					ips.push(data[index].resourceIp);
+					ipCount.push(data[index].ipCount);
+				}
+				myChart = echarts.init(document.getElementById("imageTop"));
+				option = {
+					color: ['#3398DB'],
+					tooltip : {
+						trigger: 'axis',
+						axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+							type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+						}
+					},
+					grid: {
+						x : '30%',
+						y : '5%',
+						x2 : '8%',
+						y2 : '25%'
+					},
+					xAxis : [
+						{
+							type : 'value',
+							axisLabel : {
+								textStyle : {
+									color : '#fff',
+								}
+							},
+						}
+					],
+					yAxis : [
+						{
+							type : 'category',
+							data : ips,
+							axisTick: {
+								alignWithLabel: true
+							},
+							axisLabel: {
+								interval : 0,
+								textStyle : {
+									color : '#fff',
+									fontSize : 10
+								}
+							}
+						}
+					],
+					series : [
+						{
+							name:'数量',
+							type:'bar',
+							barWidth: '30%',
+							data: ipCount
+						}
+					]
+				};
+				myChart.setOption(option);
+			}
+		})
+	}
+
+	//钓鱼iptop5
+	function showDiaoyuIpTop(isShow){
+		if(!isShow){
+			$("#diaoyuIpTop").hide();
+			return;
+		}
+		$.ajax({
+			type : 'post',
+			url : 'overview/getIpTopn/diaoyu',
+			contentType : "application/json",
+			dataType : "json",
+			error : function(){
+				alert("钓鱼ip数据请求错误！");
+			},
+			success : function(data){
+				var ips = new Array();
+				var ipCount = new Array();
+				for(var index=0; index<data.length; index++){
+					ips.push(data[index].resourceIp);
+					ipCount.push(data[index].ipCount);
+				}
+				myChart = echarts.init(document.getElementById("textTop"));
+				option = {
+					color: ['#3398DB'],
+					tooltip : {
+						trigger: 'axis',
+						axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+							type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+						}
+					},
+					grid: {
+						x : '28%',
+						y : '5%',
+						x2 : '8%',
+						y2 : '25%'
+					},
+					xAxis : [
+						{
+							type : 'value',
+							axisLabel : {
+								textStyle : {
+									color : '#fff'
+								}
+							}
+						}
+					],
+					yAxis : [
+						{
+							type : 'category',
+							data : ips,
+							axisTick: {
+								alignWithLabel: true
+							},
+							axisLabel: {
+								interval : 0,
+								textStyle : {
+									color : '#fff',
+									fontSize : 10
+								}
+							}
+						}
+					],
+					series : [
+						{
+							name:'数量',
+							type:'bar',
+							barWidth: '30%',
+							data: ipCount
+						}
+					]
+				};
+				myChart.setOption(option);
+			}
+		})
+	}
+
+	//钓鱼域名top5
+	function showDiaoyuDomainTop(isShow){
+		if(!isShow){
+			$("#diaoyuDomainTop").hide();
+			return;
+		}
+		$.ajax({
+			type : 'post',
+			url : 'overview/getDomainTopn/diaoyu',
+			contentType : "application/json",
+			dataType : "json",
+			error : function(){
+				alert("钓鱼domain数据请求错误！");
+			},
+			success : function(data){
+				var tbody = $("#textDomain");
+				tbody.empty();
+				for(var index in data){
+					if(typeof data[index] == "function"){
+						continue;
+					}
+					var tr = $("<tr></tr>");
+					tr.append("<td title="+data[index].resourceDomain+">"+data[index].resourceDomain+"</td>");
+					tr.append("<td>"+data[index].domainCount+"</td>");
+					tr.append("<td title="+data[index].domainFirm+">"+data[index].domainFirm+"</td>");
+					tbody.append(tr);
+				}
+			}
+		})
+	}
+</script>
+
+<!-- css样式 -->
+<style type="text/css">
+	.index_all{
+			width: 100%;
+			height: 94vh;
+		}
+	.kuang_list{
+		width: 100%;
+		background: url(${ctxPath}/static/app/img/01.png) no-repeat;
+		background-size: 100% 100%;
+		margin-top:1vh;
+		margin-bottom:1vh;
+	}
+	.kuang_list h3{
+		color: #00f3fc;
+		font-size: 14px;
+	    line-height: 30px;
+	    margin-left: 15px;
+	    margin-top: 0;
+	    margin-bottom: 0;
+	}
+	.iconlist{
+		width:130px;
+		height:30px;
+		line-height:30px;
+		font-size:14px;
+		color:#fff;
+		background:url(${ctxPath}/static/app/img/icon01.png) no-repeat;
+		background-size: 100% 100%;
+		text-align:center;
+	}
+	table{
+		margin-left:5%;
+		width:90%;
+		color:#1e917e;
+		text-align:center;
+		height:77%;
+		table-layout:fixed;
+		cellspacing: 0;
+		cellpadding: 0;
+		font-size:12px;
+	}
+	table th{
+		text-align: center;
+		color: #58abda;
+		border: 1px solid #003c57;
+	}
+	tr td{
+		border: 1px solid #003c57;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	th:nth-child(2){
+	    width: 25%;
+	}
+	tr td:nth-child(2){
+		width: 25%;
+	}
+</style>

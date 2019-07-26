@@ -1,0 +1,236 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+	    <li class="active"><a data-toggle="tab" href="#ip" id="aip"> <i
+				class="green ace-icon fa fa-users bigger-120"></i>ip topn
+		</a></li>
+		
+		<li class=""><a data-toggle="tab" href="#domain" id="adomain"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 域名topn
+		</a></li>
+		
+		<!-- <li class=""><a data-toggle="tab" href="#terrain" id="terrain"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 地市topn
+		</a></li> -->
+		
+	</ul>
+
+	<div class="tab-content">
+		<div id="ip" class="tab-pane active clearfix">
+			<#search>
+			<form action="${ctxPath}/blTopn/getIp" method="post" id="search-form-ip"
+				target="list-page1" class="center clearfix">
+				<div class="row padding-tb-10">
+				    <div class="col-sm-6">
+						<label class="inline">开始日期：</label> <input type="text"
+							class="width-45" name="ipstartdate" id="ipstartdate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${startDate}" readonly />
+					</div>
+					<div class="col-sm-6" style="margin-left:-2%">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="ipenddate" id="ipenddate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${endDate}" readonly />
+					</div>
+					<div class="col-sm-6" style="margin-left:-2%">
+						<label class="inline">类型：</label> 
+						<select id="iptype" name="iptype" style="width: 45%">
+					            <option value="0">所有</option>
+								<option value="1">图片</option>
+								<option value="2">文本</option>
+				        </select>
+					</div>
+					<div class="col-sm-6" style="margin-left:-3%">
+						<label class="inline">top：</label>
+						<select id="iptop" name="iptop" style="width: 45%">
+					            <option value="5">5</option>
+					            <option value="10">10</option>
+				        </select>
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="search-btn-ip" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:-12%;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="export-btn-ip" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:12%;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div id="list-page1"></div>
+		</div>
+		
+		<div id="domain" class="tab-pane clearfix">
+			<#search>
+			<form action="${ctxPath}/blTopn/getDomain" method="post" id="search-form-domain"
+				target="list-page2" class="center clearfix">
+				<div class="row padding-tb-10">
+				    <div class="col-sm-6">
+						<label class="inline">开始日期：</label> <input type="text"
+							class="width-45" name="domainstartdate" id="domainstartdate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${startDate}" readonly />
+					</div>
+					<div class="col-sm-6" style="margin-left:-2%">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="domainenddate" id="domainenddate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${endDate}" readonly />
+					</div>
+					<div class="col-sm-6" style="margin-left:-2%">
+						<label class="inline">类型：</label> 
+						</select> <select id="domaintype" name="domaintype" style="width: 45%">
+					            <option value="0">所有</option>
+								<option value="1">图片</option>
+								<option value="2">文本</option>
+				        </select>
+					</div>
+					<div class="col-sm-6" style="margin-left:-3%">
+						<label class="inline">top：</label>
+						</select> <select id="domaintop" name="domaintop" style="width: 45%">
+					            <option value="5">5</option>
+					            <option value="10">10</option>
+				        </select>
+					</div>
+					<div class="col-sm-3">
+					    <a href="javascript:condomain();" class="width-55" >
+						<input type="text" class="width-45" id="search-btn-domain" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:-12%;" value="条件查询" readonly/>
+						</a>
+						<input type="text" class="width-45" id="export-btn-domain" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:12%;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div id="list-page2"></div>
+		</div>
+		
+		<div id="terrain" class="tab-pane clearfix">
+			<#search>
+			<form action="${ctxPath}/blTopn/getTerrain" method="post" id="search-form-terrain"
+				target="list-page2" class="center clearfix">
+				<div class="row padding-tb-10">
+				    <div class="col-sm-6">
+						<label class="inline">开始日期：</label> <input type="text"
+							class="width-45" name="domainstartdate" id="domainstartdate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${startDate}" readonly />
+					</div>
+					<div class="col-sm-6" style="margin-left:-2%">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="domainenddate" id="domainenddate"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${endDate}" readonly />
+					</div>
+					<div class="col-sm-6" style="margin-left:-2%">
+						<label class="inline">类型：</label> 
+						</select> <select id="domaintype" name="domaintype" style="width: 45%">
+					            <option value="0">所有</option>
+								<option value="1">图片</option>
+								<option value="2">文本</option>
+				        </select>
+					</div>
+					<div class="col-sm-6" style="margin-left:-3%">
+						<label class="inline">top：</label>
+						</select> <select id="domaintop" name="domaintop" style="width: 45%">
+					            <option value="5">5</option>
+					            <option value="10">10</option>
+				        </select>
+					</div>
+					<div class="col-sm-3">
+					    <a href="javascript:condomain();" class="width-55" >
+						<input type="text" class="width-45" id="search-btn-terrain" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:-12%;" value="条件查询" readonly/>
+						</a>
+						<input type="text" class="width-45" id="export-btn-terrain" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:12%;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div id="list-page4"></div>
+		</div>
+		
+	</div>
+</div>
+<style>
+#home input{background:#18202d;color:#fff;}
+#home select{background:#18202d;color:#fff;}
+</style>
+<script>
+
+	/* var date = new Date(); 
+	var year = date.getFullYear(); 
+	var month =(date.getMonth() + 1).toString(); 
+	var day = (date.getDate()).toString();  
+	if (month.length == 1) { 
+	    month = "0" + month; 
+	} 
+	if (day.length == 1) { 
+	    day = "0" + day; 
+	}
+	var sdateTime = getSdate(date);
+	var edateTime = year + "-" + month + "-" + day;
+	//ip
+	$("#ipstartdate").val(sdateTime);
+	$("#ipenddate").val(edateTime);
+	//domain
+	$("#domainstartdate").val(sdateTime);
+	$("#domainenddate").val(edateTime);
+	//terrain
+	$("#terrainstartdate").val(sdateTime);
+	$("#terrainenddate").val(sdateTime); */
+
+	
+	$("#search-form-ip").getPageList({
+		'submitBtnId' : 'search-btn-ip'
+	});
+	
+	$("#adomain").click(function(){
+		$("#search-form-domain").getPageList({
+			'submitBtnId' : 'search-btn-domain'
+		});
+	})
+	
+	$("#terrain").click(function(){
+		console.log("aaa");
+		$("#search-form-terrain").getPageList({
+			'submitBtnId' : 'search-btn-terrain'
+		});
+	})
+		
+	
+	$(function(){
+		$("#sx").hide();
+		$("#tj").hide();
+		
+	})
+	
+	/* function getSdate(date){
+		
+		var year = date.getFullYear(); 
+		var month =(date.getMonth()).toString(); 
+		var day = (date.getDate()).toString();  
+		if (month.length == 1) { 
+		    month = "0" + month; 
+		} 
+		if (day.length == 1) { 
+		    day = "0" + day; 
+		}
+		
+		var time = year + "-" + month + "-" + day;
+		//alert(time);
+		return time;
+	} */
+	
+	
+	$("#export-btn-ip").click(function(){
+		$("#iptable").table2excel({
+			exclude: ".noExl",
+            filename: "不良Iptopn分析"+(new Date()).getTime(),
+            exclude_img: true,
+            exclude_links: true,
+            exclude_inputs: true
+		});
+	});
+	
+	$("#export-btn-domain").click(function(){
+		$("#domaintable").table2excel({
+			exclude: ".noExl",
+            filename: "不良域名topn分析"+(new Date()).getTime(),
+            exclude_img: true,
+            exclude_links: true,
+            exclude_inputs: true
+		});
+	});
+	
+	
+</script>

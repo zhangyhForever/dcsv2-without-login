@@ -1,0 +1,190 @@
+<div id="demosticEacherts" style="margin-top:10px;width:100%;height: 380%; top: 50; overflow:hidden; "></div>
+<div id="demostictable" style="display:none; "></div>
+
+<script>
+		var map = ${map};
+		var startDate = map[0].domesticstartdate;
+		var endDate = map[0].domesticenddate;
+		//console.log(startDate);
+		var url;
+		$(function(){
+			url = "${ctxPath}/SWOTAnalysis/getDomesticMap";
+			getMap(url,startDate,endDate); 
+		})
+		var zoomAdd = 1;
+		function getMap(url,startDate,endDate){
+			//alert(startDate);
+		    $.ajax({
+		    	url: url,
+		    	data :{"startDate":startDate,"endDate":endDate},
+				dataType:"json",
+				type:"post",
+				async:false,
+				success:function(data){
+					
+					var res = [];
+					var typeArr = [];
+					var valueArr = []; 
+					var table = '<table class="table table-striped table-bordered table-hover nomargin-bottom" id="situationtable"><thead><tr><th class="center">数据来源</th><th class="center" style="display:none">类型</th><th class="center" style="display:none">数量</th></tr></thead><tbody class="tbod">';
+					for (var i = 0; i < data.length; i++) {
+						var xytude = data[i].tude.split(",");
+						var type = data[i].type.split(",");
+						var value = data[i].value.split(",");
+						typeArr.push(type);
+						valueArr.push(value);
+						res.push({
+			                name:  data[i].name,
+			                value: xytude.concat(data[i].sumvalue)
+			            });
+						
+						table+='<tr><td class="center">'+data[i].name+'</td>'+'<td class="center">'+data[i].type+'</td>'+'<td>'+data[i].value+'</td></tr>';
+					}
+					
+					$("#demostictable").html(table);
+					
+					var myEcharts = echarts.init(document.getElementById("demosticEacherts"));
+					option = {
+					    title: {
+					        x:'center',
+					        textStyle: {
+					            color: '#fff'
+					        }
+					    },
+					    toolbox: {  
+							show : true,  
+							feature : {  
+								mark : {show: true},  
+								dataView : {show: true, readOnly: false},  
+								restore : {show: true},  
+								saveAsImage : {show: true,backgroundColor: 'black'}
+							},
+							x:"right",
+							y:"bottom"
+						},
+					    tooltip: {
+					        trigger: 'item',
+					        formatter: function (params,ticket,callback) {
+					        	var tooltipStr = '<span>'+params.name + ' : ' + params.value[2] +'</span><br>';
+					        	for (var i = 0; i < typeArr.length; i++) {
+					        		if(params.data.name==res[i].name){
+					        			for(var j=0; j<typeArr[i].length; j++){
+		   			        			tooltipStr += '<span>' + typeArr[i][j] + ' : '+valueArr[i][j]+'</span><br>';
+					        			}
+					        		} 
+								}
+					        	return tooltipStr;
+					        } 
+					    }, 
+					    geo: {
+					    	roam : 'move',
+					    	show : true,
+					    	zoom: 1,
+							layoutCenter : [ "50%", "49%"], //地图位置
+							layoutSize : "128%",
+					        map: 'china',
+					        label: {
+				                normal: {
+				                    show: false
+				                },
+				                emphasis: {
+				                    show: false
+				                }
+				            },
+					       itemStyle: {
+					            normal: {
+					                areaColor: '#04284e',
+					                borderColor: '04284e'
+					            },
+					            emphasis: {
+					                areaColor: '04284e'
+					            }
+					        } 
+					    },
+					    visualMap : {
+								//图例值控制
+								min : 0,
+								max : 10000,
+								show : false,
+								calculable : true,
+								color : [ "#0bc7f3" ],
+								textStyle : {
+									color : "#fff"
+								},
+							},
+					    series: [
+					        {
+					            //name: 'pm2.5',
+					            type: 'effectScatter',
+					            coordinateSystem: 'geo',
+					            data: res,
+					            //symbolSize: 
+					            symbolSize: function(val) {
+					                return val[0] / 13;
+					            },
+					            showEffectOn: 'render',
+					            zlevel: 2,
+					            rippleEffect: {
+					                period: 2.5, //波纹秒数
+					                brushType: 'stroke', //stroke(涟漪)和fill(扩散)，两种效果
+					                scale: 4 //波纹范围
+					            },
+					            hoverAnimation: true,
+					            label: {
+					                normal: {
+					                    show: true,
+					                    position : "right", //显示位置
+					                    offset : [
+											5,
+											0 ], //偏移设置
+									    formatter : "{b}" //圆环显示文字
+					                },
+					                emphasis: {
+					                    show: true
+					                }
+					            },
+					            itemStyle: {
+					                emphasis: {
+					                    borderColor: '#fff',
+					                    borderWidth: 2
+					                }
+					            }
+					        }
+					    ]
+					}
+					myEcharts.setOption(option);
+					//去除默认的鼠标事件
+					document.oncontextmenu = function () { return false; }; 
+					
+					//新加上鼠标右击事件
+					myEcharts.on('contextmenu', function (params) {
+						if(zoomAdd > 1){
+		   				myEcharts.off('contextmenu');
+		   				myEcharts.off('click');
+							url = "${ctxPath}/SWOTAnalysis/getDomesticMap";
+							getMap(url,startDate,endDate);
+		   				var option = myEcharts.getOption();
+		   				var zoom = option.geo[0].zoom;
+							option.geo[0].zoom = --zoomAdd;
+							myEcharts.setOption(option);
+						}
+					}); 
+					myEcharts.on('click',function(param){
+						if(zoomAdd < 2){
+		   				myEcharts.off('click');
+		   				myEcharts.off('contextmenu');
+							url = "${ctxPath}/SWOTAnalysis/getDomesticMaps";
+							getMap(url,startDate,endDate);
+							var option = myEcharts.getOption();
+							var zoom = option.geo[0].zoom;
+							option.geo[0].zoom = ++zoomAdd;
+							myEcharts.setOption(option);
+						}
+					})
+				},
+				error:function(){
+					alert("解析失败,请联系管理员");
+				}
+		   })
+		}
+			
+</script>

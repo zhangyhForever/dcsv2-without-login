@@ -1,0 +1,73 @@
+<table class="table table-striped table-bordered table-hover nomargin-bottom" id="table">
+	<thead>
+		<tr>
+			<th class="center">原始域名</th>
+			<th class="center">检测完成时间</th>
+			<th class="center">是否有跳转</th>
+			<!-- <th class="center">取消操作</th> -->
+		</tr>
+	</thead>
+
+	<tbody class="tbod">
+		@for(item in audits){
+		<tr>
+			<td class="center"><a class="green"
+				href="javascript:void(0)" onclick="ope(this,'${item.oriHost}')">${item.oriHost}
+				<input type="hidden" value="${item.oriHost}"/></a></td>
+			<td class="center">${item.endTime}</td>
+			<td id="${item.auditId}" class="center">
+				<a class="green" href="javascript:void(0)" data-mode="page" data-title="${item.oriHost!}"
+				data-url="${ctxPath}/audit/show_layer/redirect" data-data="{auditId:'${item.auditId}'}">
+				<i class="ace-icon fa fa-pencil bigger-130">有跳转</i>
+				</a>
+				&nbsp;&nbsp;&nbsp;
+				<a class="green"  href="javascript:void(1)" data-mode="page" data-title="${item.oriHost!}"
+				data-url="${ctxPath}/audit/show_layer/noRedirect" data-data="{auditId:'${item.auditId}'}">
+				 <i class="ace-icon fa fa-pencil bigger-130">无跳转</i>
+				 </a>
+			</td>
+			<!-- <td class="center">
+				<a class="green"  href="javascript:void(0)" onclick="cancle(this,'${item.auditId}')">
+				 <i class="ace-icon fa fa-pencil bigger-130">取消</i>
+				 </a>
+			</td> -->
+		</tr>
+		@}
+	</tbody>
+</table>
+<script>
+	function ope(thiz,ur) {
+		$(".tbod").children("tr").each(function(){
+			$(this).css("background-color","#00132b")
+		})
+		$(thiz).parent().parent().css("background-color","rgba(255, 255, 255, 0.2)");
+		window.open(ur);
+	}
+	
+	//无跳转
+	/* function not(thiz, auditId, taskId, submitTime) {
+		$.ajax({
+			url : "${ctxPath}/audit/redirected/noRedirected",
+			type : 'post',
+			data : {
+				'auditId' : auditId,
+				'taskId' : taskId,
+				'submitTime' : submitTime
+			},
+			dataType : 'json',
+			success: function(data) {
+				$(thiz).parent().children("a").eq(1).attr("class", "red");
+				$(thiz).parent().children("a").eq(0).attr("class", "green");
+			},
+			error: function() {
+				alert("操作失败！");
+			}
+		});
+	}
+	 */
+	$(function() {
+		$("#sx").show();
+		$("#tj").hide();
+		$("#fh").hide();
+	})
+</script>

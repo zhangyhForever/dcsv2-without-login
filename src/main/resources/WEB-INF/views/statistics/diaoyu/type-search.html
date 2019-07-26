@@ -1,0 +1,111 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#tcheatType"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 欺诈类别统计
+		</a></li>
+		<li class="" onclick="showDomain();"><a data-toggle="tab" href="#domainType"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 顶级域名类别统计
+		</a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div id="cheatType" class="tab-pane active clearfix">
+			<#search>
+			<form action="${ctxPath}/dyType/dyCheatProportion" method="post" id="cheat-search-form"
+				target="cheat-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-6">
+						<label class="inline">起始日期：</label> <input type="text"
+							class="width-45" name="startDate" id="startDate" value="${startDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="endDate" id="endDate" value="${endDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">ip地址：</label>
+						<input type="text" class="width-80" name="ipOrHost" id="ipOrHost"/>
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="cheat-search-btn" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="cheat-export-btn" onclick="exportData(this);" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:20px;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="list" id="cheat-list-page" style="height:63vh"></div>
+		</div>
+		<div id="domainType" class="tab-pane clearfix">
+			<#search>
+			<form action="${ctxPath}/dyType/dyDomainProportion" method="post" id="domain-search-form"
+				target="domain-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-6">
+						<label class="inline">起始日期：</label> <input type="text"
+							class="width-45" name="startDate" id="startDate" value="${startDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-45" name="endDate" id="endDate" value="${endDate}"
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">ip地址：</label>
+						<input type="text" class="width-80" name="ipOrHost" id="ipOrHost"/>
+					</div>
+					<div class="col-sm-3">
+						<input type="text" class="width-45" id="domain-search-btn" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;" value="条件查询" readonly/>
+						<input type="text" class="width-45" id="domain-export-btn" onclick="exportData(this);" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:20px;" value="数据导出" readonly/>
+					</div>
+				</div>
+			</form>
+			</#search>
+			<div class="list" id="domain-list-page" style="height:63vh"></div>
+		</div>
+	</div>
+</div>
+<style>
+#home input{background:#18202d;color:#fff;}
+#home select{background:#18202d;color:#fff;}
+</style>
+<script>
+	$("#cheat-search-form").getPageList({
+		"submitBtnId": 'cheat-search-btn'
+	})
+	
+	function showDomain(){
+		$("#domain-search-form").getPageList({
+			"submitBtnId": 'domain-search-btn'
+		})
+	}
+	
+	function exportData(thiz){
+		var id = $(thiz).attr("id");
+		var table = $(thiz).parents(".tab-pane").children(".list").children("div").children("table");
+		var tableId = table.attr("id");
+		if(table.is(":hidden")){
+			alert("没有相关数据！");
+			return;
+		}
+		//获取当前子页面的标题内容
+		var title = $(thiz).parents(".tabbable").children("ul").children(".active").text().trim();
+		var startDate = $("#startDate").val();
+		var endDate = $("#endDate").val();
+		title = title + "(" + startDate + "至" + endDate + ")";
+		$("#"+tableId).table2excel({
+			exclude: ".noExl",
+            filename: title+(startDate-endDate),
+            exclude_img: true,
+            exclude_links: true,
+            exclude_inputs: true
+		});
+	}
+
+	$(function(){
+		$("#sx").hide();
+		$("#tj").hide();
+	})
+</script>

@@ -1,0 +1,552 @@
+<div class="container index_all">
+    <div class="row" style="margin-top: 3%;">
+
+        <div class="col-sm-3 col-md-3 col-lg-3">
+            <div id="buliangTrend" class="kuang_list" style="height: 35vh">
+                <h3>一周图文违规数量变化趋势</h3>
+                <div id="buliangWeek" style="width: 100%; height: 90%;"></div>
+            </div>
+
+            <div id="state" class="kuang_list" style="height: 35vh">
+                <h3>一周恶意事件数量变化趋势</h3>
+                <div id="maliceState" style="width: 100%; height: 90%;"></div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-6 col-md-6 col-lg-6">
+            <div id="leftOfMap" style="position:absolute;left:0;top:0;z-index:5;">
+                <!--<h5 id="dayDetectionCount" class="iconlist"></h5>-->
+                <h5 id="dayTotal" class="iconlist"></h5>
+                <h5 id="dayProcess" class="iconlist"></h5>
+                <h5 id="illegalCount" class="iconlist"></h5>
+            </div>
+
+            <div id="myChart" style="height: 75vh;width: 100%;margin-top: 1vh;margin-bottom:1vh;"></div>
+
+        </div>
+
+        <div class="col-sm-3 col-md-3 col-lg-3">
+
+            <div id="Region" class="kuang_list" style="height: 35vh;">
+                <h3>恶意事件地区分布(近一周)</h3>
+                <div id="maliceRegion" style="width: 100%; height:100%"></div>
+            </div>
+
+
+            <div id="typeProportion" class="kuang_list" style="height: 35vh;">
+                <h3>ip覆盖率</h3>
+                <div id="proportion" style="width: 100%; height: 90%;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#fx").hide();
+    $("#sx").hide();
+    $("#tj").hide();
+
+    //恶意事件一周违规情况
+    $.ajax({
+        url: 'overview/maliceState',
+        type: 'POST',
+        contentType: "application/json",
+        success: function (data) {
+            var foundTime = [0, 0, 0, 0, 0, 0, 0];
+            var stateCount = [0, 0, 0, 0, 0, 0, 0];
+            for (var i = 6, j = 0; i >= 0; i--, j++) {
+                foundTime[j] = getDateStr(i, false);
+            }
+            $.each(JSON.parse(data), function (index, value) {
+                for (var i = 0; i < foundTime.length; i++) {
+                    if (foundTime[i] === value.foundtime) {
+                        stateCount.splice(i, 1, value.statecount);
+                        break;
+                    }
+                }
+            });
+            var stateChart = echarts.init(document.getElementById('maliceState'));
+            option = {
+                color: ['#00FFFF'],
+                animation: true,
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: "{b}:<br/> {c}(条)"
+                },
+                grid: {
+                    x: '12%',
+                    y: '15%',
+                    x2: '8%',
+                    y2: '30%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: foundTime,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: -30,
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 10
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 10
+                        }
+                    }
+                },
+                series: [{
+                    data: stateCount,
+                    type: 'line'
+                }]
+            };
+            stateChart.setOption(option);
+        },
+        error: function () {
+            alert("恶意事件态势数据请求错误！");
+        }
+    });
+
+    //恶意事件区域分布
+    $.ajax({
+        url: 'overview/maliceRegion',
+        type: 'POST',
+        contentType: "application/json",
+        success: function (data) {
+            if(JSON.parse(data).length === 0){
+                $("#maliceRegion").html("<h3 style='color: #c0c0c0;margin: 32% 36%;'>本周没有数据</h3>")
+                return;
+            }
+            var regionProportion = [];
+            $.each(JSON.parse(data), function (index, value) {
+                regionProportion.push({
+                    name: value.province, value: value.regionalcount
+                });
+            });
+            var regionChart = echarts.init(document.getElementById('maliceRegion'));
+            var option = {
+                title: {
+                    show: false,
+                    text: '恶意事件地区分布统计图(最近一周)',
+                    textStyle: {
+                        fontWeight: '100',
+                        fontSize: 16,
+                        color: '#00FFFF'
+                    }
+                },
+                color: ['#05d58d', '#23b7ff', '#FFFF00', '#FF8C00', '#FF0000', '#FE8463'],
+                legend: {
+                    x: 'left',
+                    show: false,
+                    textStyle: {
+                        color: '#fff'
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}:<br/>{c}({d}%)'
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        magicType: {show: false, type: ['pie', 'bar']},
+                        saveAsImage: {show: false}
+                    }
+                },
+                calculable: true,
+                series: [
+                    {
+                        name: '恶意事件（数量）',
+                        type: 'pie',
+                        center: ['50%', '50%'],
+                        radius: ['0', '50%'],
+                        data: regionProportion
+                    }
+                ]
+            };
+            regionChart.setOption(option);
+        },
+        error: function () {
+            alert("恶意事件地区分布数据请求错误！");
+        }
+    });
+
+    //处理量统计
+    $.ajax({
+        type: 'post',
+        contentType: "application/json",
+        url: "overview/getData",
+        dataType: "json",
+        error: function () {
+            alert("不好意思,统计数据获取失败!");
+        },
+        success: function (data) {
+            /*$("#dayDetectionCount").text("总检测量：" + data.dayDetectionCount);*/
+            $("#dayTotal").text("当日发现：" + data.dayTotalCount);
+            $("#dayProcess").text("当日处理：" + data.dayProcessCount);
+            $("#illegalCount").text("当日违规：" + data.illegalCount);
+        }
+    });
+
+    //中间地图
+    $.ajax({
+        type: "post",
+        contentType: "application/json",
+        url : "overview/getCurrentCount",
+        dataType: "json",
+        error: function () {
+            alert("不好意思,图表请求数据失败啦!");
+        },
+        success: function (json) {
+            var jsonUrl = "./static/app/json/hunan.json";
+            var province = "湖南省";
+            var city = "长沙";
+            var mapName = "hunan";
+            var count = [];
+            for(var index in json) {
+                if(json[index].city === "湘西土家族苗族自治州"){
+                    count.push({
+                        name: json[index].city, value: [
+                            {name: "钓鱼网站:", value: json[index].diaoyuCount},
+                            {name: "恶意程序:", value: json[index].apkCount},
+                            {name: "不良图片:", value: json[index].imageCount},
+                            {name: "不良文本:", value: json[index].textCount}
+                        ]
+                    });
+                }else {
+                    count.push({
+                        name: json[index].city+"市", value: [
+                            {name: "钓鱼网站:", value: json[index].diaoyuCount},
+                            {name: "恶意程序:", value: json[index].apkCount},
+                            {name: "不良图片:", value: json[index].imageCount},
+                            {name: "不良文本:", value: json[index].textCount}
+                        ]
+                    });
+                }
+            }
+            $.getJSON(jsonUrl, function (geoJson) {
+                echarts.registerMap(mapName, geoJson);
+                var myChart = echarts.init(document.getElementById('myChart'));
+                var option = {
+                    title: {
+                        text: province + "违规信息分布情况",
+                        x: 'center',
+                        textStyle: {
+                            fontWeight: '100',
+                            fontSize: 18,
+                            color: '#00FFFF'
+                        }
+                    },
+                    tooltip: {  //鼠标悬浮时显示内容
+                        trigger: 'item',
+                        formatter: function(data){
+                            var city = data.name;
+                            var tip = city+":<br>";
+                            for(var i = 0; i<count.length; i++){
+                                if(city === count[i].name){
+                                    var countVal = count[i].value;
+                                    for(var j = 0; j<countVal.length; j++){
+                                        tip += countVal[j].name+"  "+countVal[j].value+"<br>";
+                                    }
+                                }
+                            }
+                            return tip;
+                        }
+                    },
+                    geo: {
+                        show: true,
+                        map: mapName,
+                        label: {
+                            color: '#fff',
+                            normal: {
+                                show: true
+                            },
+                            emphasis: {
+                                show: true
+                            }
+                        },
+                        roam: false,
+                        itemStyle: { //地图颜色
+                            normal: {
+                                areaColor: '#098a9f',
+                                borderColor: '#9be4ff',
+                                borderWidth: 2
+                            },
+                            emphasis: {
+                                areaColor: '#43b9f6'
+                            }
+                        }
+                    },
+                    series: [
+                        /*{
+                            name: province,
+                            type: 'effectScatter',
+                            coordinateSystem: 'geo',
+                            data: [
+                                {
+                                    name: province, value: [112.982279, 28.19409,city]
+                                }
+                            ],
+                            symbol: 'path://M512 39.384615l169.353846 295.384615 342.646154 63.015385-240.246154 248.123077L827.076923 984.615385l-315.076923-145.723077L196.923077 984.615385l43.323077-334.769231L0 401.723077l342.646154-63.015385L512 39.384615',
+                            symbolSize: 8,
+                            rippleEffect: {
+                                period: 5, //波纹秒数
+                                brushType: 'fill', //stroke(涟漪)和fill(扩散)，两种效果
+                                scale: 6 //波纹范围
+                            },
+                            label: {
+                                normal: {
+                                    formatter: '{a}',
+                                    position: 'right',
+                                    offset: [10, 0],
+                                    fontSize: 18,
+                                    show: true
+                                },
+                                emphasis: {
+                                    show: false
+                                }
+                            },
+                            itemStyle: {    //打点的颜色
+                                normal: {
+                                    color: '#ff0000',
+                                    shadowBlur: 100,
+                                    shadowColor: '#0d5ebd'
+                                }
+                            },
+                            zlevel: 1
+                        },*/
+                        {
+                            name: '违规数量',
+                            type: 'map',
+                            map: mapName,
+                            geoIndex: 0,
+                            label: {
+                                normal: {
+                                  show: false
+                                 },
+                                emphasis: {
+                                    show: true
+                                }
+                            },
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+            })
+        }
+    });
+
+    //一周不良违规数量趋势
+    $.ajax({
+        type: "post",
+        contentType: "application/json",
+        url: "overview/weekCount/buliang",
+        dataType: "json",
+        error: function () {
+            alert("不好意思,一周违规图文数据请求失败!");
+        },
+        success: function (json) {
+            var date = new Array(7);
+            var totalCount = [0, 0, 0, 0, 0, 0, 0];
+            var imageCount = [0, 0, 0, 0, 0, 0, 0];
+            var textCount = [0, 0, 0, 0, 0, 0, 0];
+            for (var i = 6, j = 0; i >= 0; i--, j++) {
+                date[j] = getDateStr(i, false);
+            }
+            $.each(json, function (n, value) {
+                for (var i = 0; i < date.length; i++) {
+                    if (date[i] === value.processDate) {
+                        totalCount.splice(i, 1, value.illegalCount);
+                        imageCount.splice(i, 1, value.illegalImage);
+                        textCount.splice(i, 1, value.illegalText);
+                        break;
+                    }
+                }
+            });
+            var myChart = echarts.init(document.getElementById('buliangWeek'));
+            var option = {
+                color: ['#00FFFF'],
+                animation: true,
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: "{b}:<br/>{c}(条)"
+                },
+                title: {
+                    top: 20,
+                    show: false
+                },
+                grid: {
+                    x: '12%',
+                    y: '15%',
+                    x2: '8%',
+                    y2: '30%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: date,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: -30,
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 10
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 10
+                        }
+                    }
+                },
+                series: [{
+                    data: totalCount,
+                    type: 'line'
+                }]
+            };
+            myChart.setOption(option);
+        }
+    });
+
+
+    //ip覆盖率
+    $.ajax({
+        type: "post",
+        contentType: "application/json",
+        url: "overview/getIpProportion",
+        dataType: "json",
+        error: function () {
+            alert("不好意思,违规占比请求数据失败!");
+        },
+        success: function (json) {
+            var ipProportion = [];
+            ipProportion.push({name:'已覆盖', value: json.ipcount});
+            ipProportion.push({name:'未覆盖', value: json.total});
+            myChart = echarts.init(document.getElementById('proportion'));
+            option = {
+                animation: true,
+                color: ['#14ff36', '#CDC9C9'],
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{b}:<br/>{c} ({d}%)"
+                },
+                legend: {
+                    x: 'left',
+                    show: false,
+                    textStyle: {
+                        color: '#fff'
+                    }
+                },
+                toolbox: {
+                    show: false,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+
+                    },
+                    x: "right",
+                    y: "bottom"
+                },
+                series: [
+                    {
+                        name: '',
+                        type: 'pie',
+                        radius: '60%',
+                        center: ['50%', '50%'],
+                        corsor: 'pointer',
+                        data: ipProportion,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+    });
+
+</script>
+
+<!-- css样式 -->
+<style type="text/css">
+    .index_all {
+        width: 100%;
+        height: 94vh;
+    }
+
+    .kuang_list {
+        width: 100%;
+        background: url(${ctxPath}/static/app/img/01.png) no-repeat;
+        background-size: 100% 100%;
+        margin-top: 1vh;
+        margin-bottom: 1vh;
+    }
+
+    .kuang_list h3 {
+        color: #00f3fc;
+        font-size: 14px;
+        line-height: 30px;
+        margin-left: 15px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .iconlist {
+        width: 130px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 14px;
+        color: #fff;
+        background: url(${ctxPath}/static/app/img/icon01.png) no-repeat;
+        background-size: 100% 100%;
+        text-align: center;
+    }
+
+    table {
+        margin-left: 5%;
+        width: 90%;
+        color: #1e917e;
+        text-align: center;
+        height: 77%;
+        table-layout: fixed;
+        cellspacing: 0;
+        cellpadding: 0;
+        font-size: 12px;
+    }
+
+    table th {
+        text-align: center;
+        color: #58abda;
+        border: 1px solid #003c57;
+    }
+
+    tr td {
+        border: 1px solid #003c57;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    th:nth-child(2) {
+        width: 25%;
+    }
+
+    tr td:nth-child(2) {
+        width: 25%;
+    }
+</style>

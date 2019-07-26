@@ -1,0 +1,663 @@
+<div class="tabbatle gd">
+	<div class="tab-content">
+		<div id="home" class="tab-pane active clearfix">
+			<ul class="tab1">
+				<li>
+					<div class="li_box">
+						<div class="border">
+							<div class="txt">整体系统状态情况</div>
+							<div class="main_box">
+								<div id="main1" class="main1"></div>
+							</div>
+						</div>
+					</div>
+				</li>
+				<li class="li">
+						<div class="li_box">
+							<div class="border">
+								<div class="txt">爬虫服务器负载情况</div>
+								<div class="main_box">
+									<div id="main2" class="main1"></div>
+								</div>
+							</div>
+						</div>
+				</li>
+				<li class="li">
+						<div class="li_box">
+							<div class="border">
+								<div class="txt">大数据分析服务器负载情况</div>
+								<div class="main_box">
+									<div id="main3" class="main1"></div>
+								</div>
+							</div>
+						</div>
+				</li>
+			</ul>
+			<div class="border border1" id="spider" style="display:none">
+				<div class="fwq_box">
+					<div class="fwq">
+						<div class="syl">
+							<span>爬虫服务器CPU使用率</span>
+							<div class="bfb">
+								<div style="width: 100%" id="cpuwidth">
+									<b id="spcpu"></b>
+								</div>
+							</div>
+						</div>
+						<div class="shzt">
+							<span>爬虫服务器硬盘空间使用状态</span>
+							<div class="border">
+								<div class="main_box">
+									<div id="main2_1" class="main1"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="fwq_box">
+					<div class="fwq">
+						<div class="syl">
+							<span>爬虫服务器RAM使用率</span>
+							<div class="bfb">
+								<div style="width: 100%" id="ramwidth">
+									<b id="spram"></b>
+								</div>
+							</div>
+						</div>
+						<div class="shzt">
+							<span>爬虫服务器网络使用状态</span>
+							<div class="border">
+								<div class="main_box">
+									<div id="main2_2" class="main1"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="bigData" class="border border1" style="display:none">
+				<div class="fwq_box">
+					<div class="fwq">
+						<div class="syl">
+							<span>大数据服务器CPU使用率</span>
+							<div class="bfb">
+								<div style="width: 100%" id="hacpuwidth">
+									<b id="hacpu"></b>
+								</div>
+							</div>
+						</div>
+						<div class="shzt">
+							<span>大数据服务器硬盘空间使用状态</span>
+							<div class="border">
+								<div class="main_box">
+									<div id="main3_1" class="main1"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="fwq_box">
+					<div class="fwq">
+						<div class="syl">
+							<span>大数据服务器RAM使用率</span>
+							<div class="bfb">
+								<div style="width: 100%" id="haramwidth">
+									<b id="haram"></b>
+								</div>
+							</div>
+						</div>
+						<div class="shzt">
+							<span>大数据服务器网络使用状态</span>
+							<div class="border">
+								<div class="main_box">
+									<div id="main3_2" class="main1"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$("#fh").hide();
+	$("#sx").hide();
+	$("#tj").hide();
+
+	var cpuUsage;
+	var ramUsage;
+	var hddUsage = new Array();
+	var netUsage = new Array();
+	var sploads = new Array();
+
+	var hacpuUsage;
+	var haramUsage;
+	var hahddUsage = new Array();
+	var haloads = new Array();
+	var hanetUsage = new Array();
+
+	
+	$.when(
+	//1
+	$.ajax({
+		type : "post",
+		dataType : 'json',
+		url : '${ctxPath}/sysMonitor/getSpiderServerdata',
+		async : true,
+		data : {},
+		success : function(data) {
+
+			var load = parseInt(data.sploads);
+			sploads[0] = {
+				value : load,
+				name : '已使用',
+				itemStyle : {
+					normal : {
+						color : '#dc69aa'
+					}
+				}
+			};
+			sploads[1] = {
+				value : 100 - load,
+				name : '空闲',
+				itemStyle : {
+					normal : {
+						color : '#e5cf0d'
+					}
+				}
+			};
+			var hdd = parseInt(data.hddUsage);
+			hddUsage[0] = {
+				value : hdd,
+				name : '已使用',
+				itemStyle : {
+					normal : {
+						color : '#9393ff'
+					}
+				}
+			};
+			hddUsage[1] = {
+				value : 100 - hdd,
+				name : '空闲',
+				itemStyle : {
+					normal : {
+						color : '#a6ffa6'
+					}
+				}
+			};
+			cpuUsage = data.cpuUsage;
+			ramUsage = data.ramUsage;
+
+		},
+
+	}),
+	
+	
+	//2
+	$.ajax({
+		type : "post",
+		dataType : 'json',
+		url : '${ctxPath}/sysMonitor/getHadoopServerdata',
+		async : true,
+		data : {},
+		success : function(data) {
+			var load = parseInt(data.hasploads);
+			haloads[0] = {
+				value : load,
+				name : '已使用',
+				itemStyle : {
+					normal : {
+						color : '#dc69aa'
+					}
+				}
+			};
+			haloads[1] = {
+				value : 100 - load,
+				name : '空闲',
+				itemStyle : {
+					normal : {
+						color : '#e5cf0d'
+					}
+				}
+			};
+
+			var hahdd = parseInt(data.hahddUsage);
+			hahddUsage[0] = {
+				value : hahdd,
+				name : '已使用',
+				itemStyle : {
+					normal : {
+						color : '#9393ff'
+					}
+				}
+			};
+			hahddUsage[1] = {
+				value : 100 - hahdd,
+				name : '空闲',
+				itemStyle : {
+					normal : {
+						color : '#a6ffa6'
+					}
+				}
+			};
+
+			hacpuUsage = data.hacpuUsage;
+			haramUsage = data.haramUsage;
+
+		}
+	})
+
+	).done(conStent).fail(conStent);
+
+	function conStent() {
+		$.ajax({
+			url : "${ctxPath}/sysMonitor/getHadoopNetdata",
+			contentType : "application/x-www-form-urlencoded; charset=utf-8",
+			type : "post",
+			dataType : "json",
+			async : true,
+			data : {},
+			success : function(data) {
+				hanetUsage = data.hanetUsage;
+			}
+		});
+
+		$.ajax({
+			type : "post",
+			dataType : 'json',
+			url : '${ctxPath}/sysMonitor/getSpiderNetdata',
+			async : true,
+			data : {},
+			success : function(data) {
+				netUsage = data.netUsage;
+			}
+		});
+
+		document.getElementById("spcpu").innerHTML = cpuUsage + '%';
+		document.getElementById("spram").innerHTML = ramUsage + '%';
+
+		document.getElementById("hacpu").innerHTML = hacpuUsage + '%';
+		document.getElementById("haram").innerHTML = haramUsage + '%';
+
+		document.getElementById("cpuwidth").style['width'] = parseInt(cpuUsage)
+				+ '%';
+		document.getElementById("ramwidth").style['width'] = parseInt(ramUsage)
+				+ '%';
+
+		document.getElementById("hacpuwidth").style['width'] = parseInt(hacpuUsage)
+				+ '%';
+		document.getElementById("haramwidth").style['width'] = parseInt(haramUsage)
+				+ '%';
+
+		var myChart1 = echarts.init(document.getElementById('main1'));
+		var size = '14'
+		var option1 = {
+			series : [ {
+				type : 'gauge',
+				radius : '90%',
+				axisLine : {
+					show : true,
+					lineStyle : {
+						width : parseInt(size) * 2.5,
+						shadowBlur : 0,
+						color : [ [ 0.3, '#90ee90' ], [ 0.5, '#ffa500' ],
+								[ 0.7, '#ffa500' ], [ 1, '#ff4500' ] ]
+					}
+				},
+				splitLine : {
+					length : parseInt(size) * 2.5,
+					lineStyle : {
+						width : 1
+					}
+				},
+				axisLabel : {
+					formatter : function(e) {
+						switch (e + "") {
+						case "0":
+							return "差";
+						case "30":
+							return "风险";
+						case "50":
+							return "良";
+						case "70":
+							return "优";
+						case "100":
+							return "";
+						}
+					},
+					distance : 1,
+					textStyle : {
+						fontSize : parseInt(size) * 1,
+						fontWeight : ""
+					}
+				},
+				pointer : {
+					width : parseInt(size) * 0.7
+				},
+				startAngle : 140,
+				endAngle : -140,
+				axisTick : {
+					show : true,
+					lineStyle : {
+						color : "#C7FBFC",
+						width : parseInt(size) * 0.1
+					},
+					length : parseInt(size) * 0.8,
+					splitNumber : 10
+				},
+				detail : {
+					//formatter: '{value}',
+					textStyle : {
+						fontSize : parseInt(size) * 1.5,
+						fontWeight : ""
+					}
+				},
+				data : [ {
+					value : 50,
+				//name: '仪表盘'
+				} ]
+			} ]
+		};
+		myChart1.setOption(option1);
+		this.update_Meter = function(message) {
+			myChart.setOption({
+				series : [ {
+					data : [ {
+						value : message
+					} ]
+				} ]
+			})
+		}
+
+		//二
+		var myChart2 = echarts.init(document.getElementById('main2'));
+
+		var option2 = {
+			tooltip : {
+				trigger : 'item',
+				formatter : "{b} : ({d}%)",
+			},
+			calculable : true,
+			legend : {
+				orient : 'vertical',
+				x : 'left',
+				y : 'top',
+				// data:['广州','韶关','珠海','汕头','佛山'],
+				data : [ '已使用', '空闲' ],
+				textStyle : {
+					color : '#fff'
+				}
+			},
+
+			series : [ {
+				type : 'pie',
+				center : [ '50%', '50%' ],
+				radius : [ '50%', '72%' ],
+				avoidLabelOverlap : false,
+				label : {
+					normal : {
+						show : false,
+						position : 'center'
+					},
+					emphasis : {
+						show : true,
+						textStyle : {
+							fontSize : '30',
+							fontWeight : 'bold'
+						}
+					}
+				},
+				labelLine : {
+					normal : {
+						show : false
+					}
+				},
+				data : sploads
+			} ]
+		};
+		myChart2.setOption(option2);
+		myChart2.on("click", function() {
+			//console.log("start");
+			$("#bigData").css("display", "none");
+			$("#spider").css("display", "block");
+			getSpider();
+			//console.log("end");
+		})
+
+		//三
+		var myChart3 = echarts.init(document.getElementById('main3'));
+		var option3 = {
+			tooltip : {
+				trigger : 'item',
+				formatter : "{b} : ({d}%)"
+			},
+			legend : {
+				orient : 'vertical',
+				x : 'left',
+				y : 'top',
+				// data:['广州','韶关','珠海','汕头','佛山'],
+				data : [ '已使用', '空闲' ],
+				textStyle : {
+					color : '#fff'
+				}
+			},
+			calculable : true,
+			series : [ {
+				type : 'pie',
+				center : [ '50%', '50%' ],
+				radius : [ '50%', '72%' ],
+				label : {
+					normal : {
+						show : false,
+						position : 'center'
+					},
+					emphasis : {
+						show : true,
+						textStyle : {
+							fontSize : '30',
+							fontWeight : 'bold'
+						}
+					},
+				},
+				labelLine : {
+					normal : {
+						show : false
+					}
+				},
+				data : sploads
+			} ]
+		};
+		myChart3.setOption(option3);
+		myChart3.on("click", function() {
+			//console.log("start123");
+			$("#spider").css("display", "none");
+			$("#bigData").css("display", "block");
+			getBigdata();
+			//console.log("end123");
+
+		})
+
+		//第二个下面
+		function getSpider() {
+
+			var myChart2_1 = echarts.init(document.getElementById('main2_1'));
+			var option2_1 = {
+				tooltip : {
+					trigger : 'item',
+					formatter : "{b} : {c} ({d}%)"
+				},
+				legend : {
+					orient : 'vertical',
+					x : 'left',
+					y : 'top',
+					// data:['广州','韶关','珠海','汕头','佛山'],
+					data : [ '已使用', '空闲' ],
+					textStyle : {
+						color : '#fff'
+					}
+				},
+				series : [ {
+					type : 'pie',
+					center : [ '50%', '55%' ],
+					radius : [ '0', '72%' ],
+					itemStyle : {
+						normal : {
+							label : {
+								show : true,
+								textStyle : {
+									color : '#fff'
+								}
+							},
+							labelLine : {
+								show : true
+							}
+						}
+					},
+					data : hddUsage
+				} ]
+			};
+			myChart2_1.setOption(option2_1);
+
+			var myChart2_2 = echarts.init(document.getElementById('main2_2'));
+			var option2_2 = {
+				tooltip : {
+					trigger : 'axis'
+				},
+				xAxis : [ {
+					type : 'category',
+					boundaryGap : false,
+					axisLabel : {
+						textStyle : {
+							color : '#fff'
+						}
+					},
+					data : [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+							'10', '11', '12', '13', '14', '15', '16', '17',
+							'18', '19', '20', '21', '22', '23', '24' ]
+				} ],
+				yAxis : [ {
+					type : 'value',
+					axisLabel : {
+						textStyle : {
+							color : '#fff'
+						}
+					}
+				} ],
+				series : [ {
+					name : '速率(kbps)',
+					type : 'line',
+					smooth : false,
+					itemStyle : {
+						normal : {
+							areaStyle : {
+								type : 'default',
+								color : ''
+							}
+						}
+					},
+					data : netUsage
+				} ]
+			};
+			myChart2_2.setOption(option2_2);
+		}
+
+		//第三个下面
+		function getBigdata() {
+
+			var myChart3_1 = echarts.init(document.getElementById('main3_1'));
+			var option3_1 = {
+				tooltip : {
+					trigger : 'item',
+					formatter : "{b} : {c} ({d}%)"
+				},
+				legend : {
+					orient : 'vertical',
+					x : 'left',
+					y : 'top',
+					data : [ '已使用', '空闲' ],
+					textStyle : {
+						color : '#fff'
+					}
+				},
+				series : [ {
+					type : 'pie',
+					center : [ '50%', '55%' ],
+					radius : [ '0', '72%' ],
+					itemStyle : {
+						normal : {
+							label : {
+								show : true,
+								textStyle : {
+									color : '#fff'
+								}
+							},
+							labelLine : {
+								show : true
+							}
+						}
+					},
+					data : hahddUsage
+				} ]
+			};
+			myChart3_1.setOption(option3_1);
+			var myChart3_2 = echarts.init(document.getElementById('main3_2'));
+			var option3_2 = {
+				tooltip : {
+					trigger : 'axis'
+				},
+				xAxis : [ {
+					type : 'category',
+					boundaryGap : false,
+					axisLabel : {
+						textStyle : {
+							color : '#fff'
+						}
+					},
+					data : [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+							'10', '11', '12', '13', '14', '15', '16', '17',
+							'18', '19', '20', '21', '22', '23', '24' ],
+				} ],
+				yAxis : [ {
+					type : 'value',
+					axisLabel : {
+						textStyle : {
+							color : '#fff'
+						}
+					}
+				} ],
+				series : [ {
+					name : '速率(kbps)',
+					type : 'line',
+					smooth : false,
+					itemStyle : {
+						normal : {
+							areaStyle : {
+								type : 'default',
+								color : ''
+							}
+						}
+					},
+					data : hanetUsage
+				} ]
+			};
+			myChart3_2.setOption(option3_2);
+		}
+
+	}
+
+	//一
+	/*  */
+
+	$(window).resize(function(event) {
+		myChart1.resize();
+		myChart2.resize();
+		myChart3.resize();
+		myChart2_1.resize();
+		myChart2_2.resize();
+		myChart3_1.resize();
+		myChart3_2.resize();
+	});
+</script>
+

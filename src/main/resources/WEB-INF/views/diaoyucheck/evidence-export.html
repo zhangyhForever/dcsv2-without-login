@@ -1,0 +1,84 @@
+<div class="tabbable">
+	<ul class="nav nav-tabs" id="myTab">
+		<li class="active"><a data-toggle="tab" href="#evidence"> <i
+				class="green ace-icon fa fa-users bigger-120"></i> 截图取证
+		</a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div id="evidence" class="tab-pane active clearfix">
+			<form action="" method="post" id="evidence-search-form"
+				target="evidence-list-page" class="center clearfix">
+				<div class="row padding-tb-10">
+					<div class="col-sm-6">
+						<label class="inline">起始日期：</label> <input type="text"
+							class="width-65" name="startDate" id="startDate" 
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd 00:00:00'})" readonly />
+					</div>
+					<div class="col-sm-6">
+						<label class="inline">结束日期：</label> <input type="text"
+							class="width-65" name="endDate" id="endDate" 
+							onClick="WdatePicker({dateFmt:'yyyy-MM-dd 23:59:59'})" readonly />
+					</div>
+					<div class="col-sm-7">
+						<input type="text" class="width-10" onclick="shortcut();" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;" value="截图取证" readonly hidden/>
+						<input type="text" class="width-10" onclick="reportExp();" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:20px;" value="报告下载" readonly hidden/>
+						<input type="text" class="width-10" onclick="shortcutExp();" style ="cursor:pointer;text-align:center;color:#fff;background-color:#f8ac59;margin-left:20px;" value="截图下载" readonly/>
+					</div>
+				</div>
+			</form>
+			<div class="list" id="evidence-list-page"></div>
+		</div>
+	</div>
+</div>
+<style>
+#home input{background:#18202d;color:#fff;}
+#home select{background:#18202d;color:#fff;}
+</style>
+<script>
+	$(function(){
+		$("#sx").hide();
+		$("#tj").hide();
+	})
+
+	//报告下载
+	function reportExp(){
+		var startDate = $("#startDate").val();
+		var endDate = $("#endDate").val();
+		if(timeCheck(startDate, endDate)){
+			window.location.href = "${ctxPath}/dyEvidence/reportExp?startDate=" +startDate+ "&endDate=" +endDate;
+		}
+	}
+	//截图下载
+	function shortcutExp(){
+		var startDate = $("#startDate").val();
+		var endDate = $("#endDate").val();
+		if(timeCheck(startDate, endDate)){
+			window.location.href =  "${ctxPath}/dyEvidence/screenShotExp?startDate=" +startDate+ "&endDate=" +endDate;
+		}
+	}
+	
+	//时间验证模块
+	function timeCheck(time1,time2){
+		if (time1 == "" && time2 == "") {
+	        alert("请选择时间");
+	        return false;
+	    }
+	 
+	    if (time1 == null || time1 == "") {
+	        alert("请选择起始时间");
+	        return false;
+	    }
+	    if (time2 == null || time2 == "") {
+	        alert("请选择结束时间");
+	        return false;
+	    } else {
+	 
+	    }
+	    if (time1 > time2) {
+	        alert("起始时间不能晚于结束时间");
+	        return false;
+	    }
+	    return true;
+	}
+</script>
